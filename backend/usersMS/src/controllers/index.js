@@ -1,12 +1,13 @@
 "use strict";
 const db = require("../models");
 const Users = db.users;
-//const Op = db.Sequelize.Op;
+const Op = db.Sequelize.Op;
 
-exports.create = (req, res) => {  
+exports.create = (req, res) => {
+  console.log("create".yellow);
   if (!req.body.username || !req.body.password) {
-    res.status(400).send({
-      message: "Content can not be empty !",
+    res.status(400).json({
+      message: "Content can not be empty!",
     });
     return;
   }
@@ -18,54 +19,55 @@ exports.create = (req, res) => {
 
   Users.create(user)
     .then((data) => {
-      res.send(data);
+      res.json({ result: data });
     })
     .catch((err) => {
-      res.status(500).send({
+      res.status(500).json({
         message: err.message || "Some error occurred while create the Users",
       });
     });
 };
 
 exports.findAll = (req, res) => {
-  const username = req.query.username;
-
+  console.log("findAll".yellow);
   Users.findAll()
     .then((data) => {
-      res.send(data);
+      res.json({ result: data });
     })
     .catch((err) => {
-      res.status(500).send({
+      res.status(500).json({
         message: err.message || "Some error occured while retrieving Users",
       });
     });
 };
 
 exports.findOne = (req, res) => {
+  console.log("findOne".yellow);
   const id = req.params.id;
   Users.findByPk(id)
     .then((data) => {
-      res.send(data);
+      res.json({ result: data });
     })
     .catch((err) => {
-      res.status(500).send({
+      res.status(500).json({
         message: "Error retrieving user with id=" + id,
       });
     });
 };
 
 exports.update = (req, res) => {
+  console.log("update".yellow);
   const id = req.params.id;
 
   Users.update(req.body, {
     where: { id: id },
   }).then((data) => {
     if (data) {
-      res.send({
-        message: "user was updated successfully",
+      res.json({
+        result: data,
       });
     } else {
-      res.send({
+      res.json({
         message: `Cannot update user with id=${id}`,
       });
     }
@@ -73,17 +75,18 @@ exports.update = (req, res) => {
 };
 
 exports.delete = (req, res) => {
+  console.log("delete".yellow);
   const id = req.params.id;
 
-  user.destroy({
+  Users.destroy({
     where: { id: id },
   }).then((data) => {
     if (data) {
-      res.send({
-        message: "user was delete successfully!",
+      res.json({
+        result: data,
       });
     } else {
-      res.send({
+      res.json({
         message: `Cannot delete user with id=${id}`,
       });
     }

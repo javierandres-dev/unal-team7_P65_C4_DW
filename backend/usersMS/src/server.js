@@ -15,6 +15,7 @@ server.get("/", (req, res) => {
 
 db.sequelize.sync();
 
+server.use(express.json());
 server.use("/api/users", routes);
 
 server.listen(port, () => {
