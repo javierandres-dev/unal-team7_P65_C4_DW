@@ -2,6 +2,7 @@
 const db = require("./models");
 const routes = require("./routes");
 const colors = require("colors");
+const cors = require("cors");
 const express = require("express");
 
 const port = 4000;
@@ -9,12 +10,13 @@ const port = 4000;
 const server = express();
 
 server.get("/", (req, res) => {
-  res.json({message: "Hello, World!"});
+  res.json({ message: "Hello, World!" });
   console.log("Hello, World!".green);
 });
 
 db.sequelize.sync();
 
+server.use(cors());
 server.use(express.json());
 server.use("/api/users", routes);
 
