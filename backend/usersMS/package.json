@@ -19,7 +19,6 @@
     "sequelize": "^6.9.0"
   },
   "devDependencies": {
-    "colors": "^1.4.0",
     "nodemon": "^2.0.14"
   },
   "nodemonConfig": {

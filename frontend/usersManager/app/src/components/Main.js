@@ -11,21 +11,26 @@ import Container from "react-bootstrap/Container";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
+import Alert from "react-bootstrap/Alert";
 import { useEffect, useState } from "react";
 
 const initialCustomer = {
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
 };
 
 export const Main = () => {
-  const [customers, setCustomers] = useState([]);
+  const [customers, setCustomers] = useState(null);
   const [customer, setCustomer] = useState(initialCustomer);
   const [id, setId] = useState(null);
   const [cta, setCta] = useState(null);
   const [title, setTitle] = useState(null);
   const [form, setForm] = useState(false);
+  const [msgForm, setMsgForm] = useState(null);
   const [question, setQuestion] = useState(false);
+  const [validated, setValidated] = useState(false);
 
   const closeForm = () => setForm(false);
   const showForm = () => setForm(true);
@@ -64,15 +69,30 @@ export const Main = () => {
 
   const getFindAll = async () => {
     const res = await findAll();
-    if (res) {
-      setCustomers(res.result);
+    if (res.message === "Successfully") {
+      setCustomers(res.data);
     }
   };
 
   const createCustomer = async (e) => {
     e.preventDefault();
+    const fields = e.currentTarget;
+    if (fields.checkValidity() === false) {
+      e.stopPropagation();
+    }
+    setValidated(true);
+    if (
+      customer.firstName === "" ||
+      customer.lastName === "" ||
+      customer.email === "" ||
+      customer.password === ""
+    ) {
+      setMsgForm("Todos los campos son obligatorios");
+      return;
+    }
     const res = await createOne(customer);
-    if (res.result) {
+    console.log(res);
+    if (res.message === "Successfully") {
       setCta(null);
       setTitle(null);
       closeForm();
@@ -83,10 +103,12 @@ export const Main = () => {
   const getCurrentCustomer = async () => {
     if (id) {
       const currentCustomer = await findOne(id);
-      if (currentCustomer.result) {
+      if (currentCustomer.message === "Successfully") {
         setCustomer({
-          email: currentCustomer.result.username,
-          password: currentCustomer.result.password,
+          firstName: currentCustomer.data.firstName,
+          lastName: currentCustomer.data.lastName,
+          email: currentCustomer.data.email,
+          password: currentCustomer.data.password,
         });
       }
     }
@@ -94,8 +116,22 @@ export const Main = () => {
 
   const updateCustomer = async (e) => {
     e.preventDefault();
+    const fields = e.currentTarget;
+    if (fields.checkValidity() === false) {
+      e.stopPropagation();
+    }
+    setValidated(true);
+    if (
+      customer.firstName === "" ||
+      customer.lastName === "" ||
+      customer.email === "" ||
+      customer.password === ""
+    ) {
+      setMsgForm("Todos los campos son obligatorios");
+      return;
+    }
     const res = await updateOne(id, customer);
-    if (res.result) {
+    if (res.message === "Successfully") {
       setId(null);
       setCta(null);
       setTitle(null);
@@ -107,7 +143,7 @@ export const Main = () => {
   const deleteCustomer = async () => {
     if (id) {
       const res = await deleteOne(id);
-      if (res.result) {
+      if (res.message === "Successfully") {
         setId(null);
         setCta(null);
         closeQuestion();
@@ -144,26 +180,26 @@ export const Main = () => {
       </Button>
       <Table responsive>
         <thead className="text-center">
-          {customers.length > 0 ? (
+          {customers?.length > 0 ? (
             <tr>
               <th>#</th>
-              <th>Correo Electrónico</th>
-              <th colSpan="3">Opciones</th>
+              <th>Cliente</th>
+              <th>Opciones</th>
             </tr>
           ) : (
             <tr>
-              <td colSpan="5"></td>
+              <td colSpan="3"></td>
             </tr>
           )}
         </thead>
         <tbody>
-          {customers && customers.length > 0 ? (
+          {customers?.length > 0 ? (
             customers.map((customer, idx) => {
               return (
                 <tr key={customer.id}>
                   <td>{idx + 1}</td>
-                  <td>{customer.username}</td>
-                  <td>
+                  <td>{`${customer.firstName} ${customer.lastName}`}</td>
+                  <td className="text-center">
                     <Button
                       variant="info"
                       size="sm"
@@ -174,11 +210,10 @@ export const Main = () => {
                     >
                       Ver más...
                     </Button>
-                  </td>
-                  <td>
                     <Button
                       variant="warning"
                       size="sm"
+                      className="mx-3"
                       onClick={() => {
                         setId(customer.id);
                         setCta("update");
@@ -186,8 +221,6 @@ export const Main = () => {
                     >
                       Actualizar
                     </Button>
-                  </td>
-                  <td>
                     <Button
                       variant="danger"
                       size="sm"
@@ -204,7 +237,7 @@ export const Main = () => {
             })
           ) : (
             <tr className="text-center">
-              <td colSpan="5">Sin clientes</td>
+              <td colSpan="3">Sin clientes</td>
             </tr>
           )}
         </tbody>
@@ -220,7 +253,29 @@ export const Main = () => {
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form noValidate validated={validated}>
+            <Form.Group className="mb-3" controlId="formBasicFirstName">
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                name="firstName"
+                value={customer.firstName}
+                onChange={handleChange}
+                required
+                readOnly={cta === "read"}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicLastName">
+              <Form.Label>Apellido</Form.Label>
+              <Form.Control
+                type="text"
+                name="lastName"
+                value={customer.lastName}
+                onChange={handleChange}
+                required
+                readOnly={cta === "read"}
+              />
+            </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control
@@ -228,21 +283,22 @@ export const Main = () => {
                 name="email"
                 value={customer.email}
                 onChange={handleChange}
+                required
+                readOnly={cta === "read"}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={customer.password}
-                onChange={handleChange}
-              />
-            </Form.Group>
-            <Form.Group
-              className="mb-3"
-              controlId="formBasicCheckbox"
-            ></Form.Group>
+            {cta === "read" ? null : (
+              <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Label>Contraseña</Form.Label>
+                <Form.Control
+                  type="password"
+                  name="password"
+                  value={customer.password}
+                  onChange={handleChange}
+                  required
+                />
+              </Form.Group>
+            )}
             {cta === "read" ? null : (
               <Button
                 variant="primary"
@@ -253,6 +309,11 @@ export const Main = () => {
               </Button>
             )}
           </Form>
+          {msgForm ? (
+            <Alert variant="warning" className="my-2">
+              {msgForm}
+            </Alert>
+          ) : null}
         </Modal.Body>
         <Modal.Footer>
           <Button

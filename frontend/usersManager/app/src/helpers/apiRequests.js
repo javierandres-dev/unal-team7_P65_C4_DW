@@ -1,17 +1,21 @@
 const url = "http://localhost:4000/api/users";
 
 export const createOne = async (obj) => {
+  console.log(obj)
   return await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username: obj.email,
+      firstName: obj.firstName,
+      lastName: obj.lastName,
+      email: obj.email,
       password: obj.password,
     }),
   })
     .then((response) => {
+      console.log(response)
       if (response.ok) {
         return response.json();
       } else {
@@ -20,6 +24,7 @@ export const createOne = async (obj) => {
     })
     .catch((error) => {
       console.error(error);
+      return {error: error}
     });
 };
 
@@ -58,7 +63,9 @@ export const updateOne = async (id, obj) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username: obj.email,
+      firstName: obj.firstName,
+      lastName: obj.lastName,
+      email: obj.email,
       password: obj.password,
     }),
   })
