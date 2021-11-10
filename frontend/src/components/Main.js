@@ -98,7 +98,7 @@ export const Main = () => {
           />
         )}
         {profile === "Administradores" && <Admin />}
-        {profile === "Clientes" && <Customer />}
+        {profile === "Clientes" && <Customer accountNumber={user.accountNumber} />}
       </Container>
       <Aside msg={msg} />
     </>
