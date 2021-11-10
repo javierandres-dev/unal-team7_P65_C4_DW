@@ -20,6 +20,7 @@ exports.create = (req, res) => {
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
+    isAdmin: req.body.isAdmin || false,
   };
 
   Users.create(user)

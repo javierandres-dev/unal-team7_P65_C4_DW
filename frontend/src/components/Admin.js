@@ -1,29 +1,25 @@
 import {
   createOne,
-  findAll,
   findOne,
   updateOne,
   deleteOne,
 } from "../helpers/apiRequests";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import Container from "react-bootstrap/Container";
-import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import Alert from "react-bootstrap/Alert";
 import { useEffect, useState } from "react";
 
-const initialCustomer = {
+const initialUser = {
   firstName: "",
   lastName: "",
   email: "",
   password: "",
 };
 
-export const Main = () => {
-  const [customers, setCustomers] = useState(null);
-  const [customer, setCustomer] = useState(initialCustomer);
+export const Admin = ({ users, getFindAll }) => {
+  const [user, setUser] = useState(initialUser);
   const [id, setId] = useState(null);
   const [cta, setCta] = useState(null);
   const [title, setTitle] = useState(null);
@@ -39,13 +35,9 @@ export const Main = () => {
   const showQuestion = () => setQuestion(true);
 
   useEffect(() => {
-    getFindAll();
-  }, []);
-
-  useEffect(() => {
     switch (cta) {
       case "create":
-        setCustomer(initialCustomer);
+        setUser(initialUser);
         setTitle("Agregar Nuevo Cliente");
         showForm();
         break;
@@ -67,13 +59,6 @@ export const Main = () => {
     }
   }, [cta]);
 
-  const getFindAll = async () => {
-    const res = await findAll();
-    if (res.message === "Successfully") {
-      setCustomers(res.data);
-    }
-  };
-
   const createCustomer = async (e) => {
     e.preventDefault();
     const fields = e.currentTarget;
@@ -82,16 +67,15 @@ export const Main = () => {
     }
     setValidated(true);
     if (
-      customer.firstName === "" ||
-      customer.lastName === "" ||
-      customer.email === "" ||
-      customer.password === ""
+      user.firstName === "" ||
+      user.lastName === "" ||
+      user.email === "" ||
+      user.password === ""
     ) {
       setMsgForm("Todos los campos son obligatorios");
       return;
     }
-    const res = await createOne(customer);
-    console.log(res);
+    const res = await createOne(user);
     if (res.message === "Successfully") {
       setCta(null);
       setTitle(null);
@@ -104,7 +88,7 @@ export const Main = () => {
     if (id) {
       const currentCustomer = await findOne(id);
       if (currentCustomer.message === "Successfully") {
-        setCustomer({
+        setUser({
           firstName: currentCustomer.data.firstName,
           lastName: currentCustomer.data.lastName,
           email: currentCustomer.data.email,
@@ -122,15 +106,15 @@ export const Main = () => {
     }
     setValidated(true);
     if (
-      customer.firstName === "" ||
-      customer.lastName === "" ||
-      customer.email === "" ||
-      customer.password === ""
+      user.firstName === "" ||
+      user.lastName === "" ||
+      user.email === "" ||
+      user.password === ""
     ) {
       setMsgForm("Todos los campos son obligatorios");
       return;
     }
-    const res = await updateOne(id, customer);
+    const res = await updateOne(id, user);
     if (res.message === "Successfully") {
       setId(null);
       setCta(null);
@@ -154,20 +138,14 @@ export const Main = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCustomer({
-      ...customer,
+    setUser({
+      ...user,
       [name]: value,
     });
   };
 
   return (
-    <Container className="my-5">
-      <h1 className="text-center">
-        Clientes
-        <Badge bg="success" className="mx-2">
-          The Greens Bank
-        </Badge>
-      </h1>
+    <>
       <Button
         variant="primary"
         size="lg"
@@ -180,7 +158,7 @@ export const Main = () => {
       </Button>
       <Table responsive>
         <thead className="text-center">
-          {customers?.length > 0 ? (
+          {users?.length > 0 ? (
             <tr>
               <th>#</th>
               <th>Cliente</th>
@@ -193,18 +171,18 @@ export const Main = () => {
           )}
         </thead>
         <tbody>
-          {customers?.length > 0 ? (
-            customers.map((customer, idx) => {
+          {users?.length > 0 ? (
+            users.map((user, idx) => {
               return (
-                <tr key={customer.id}>
+                <tr key={user.id}>
                   <td>{idx + 1}</td>
-                  <td>{`${customer.firstName} ${customer.lastName}`}</td>
+                  <td>{`${user.firstName} ${user.lastName}`}</td>
                   <td className="text-center">
                     <Button
                       variant="info"
                       size="sm"
                       onClick={() => {
-                        setId(customer.id);
+                        setId(user.id);
                         setCta("read");
                       }}
                     >
@@ -215,7 +193,7 @@ export const Main = () => {
                       size="sm"
                       className="mx-3"
                       onClick={() => {
-                        setId(customer.id);
+                        setId(user.id);
                         setCta("update");
                       }}
                     >
@@ -225,7 +203,7 @@ export const Main = () => {
                       variant="danger"
                       size="sm"
                       onClick={() => {
-                        setId(customer.id);
+                        setId(user.id);
                         setCta("delete");
                       }}
                     >
@@ -259,7 +237,7 @@ export const Main = () => {
               <Form.Control
                 type="text"
                 name="firstName"
-                value={customer.firstName}
+                value={user.firstName}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -270,7 +248,7 @@ export const Main = () => {
               <Form.Control
                 type="text"
                 name="lastName"
-                value={customer.lastName}
+                value={user.lastName}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -281,7 +259,7 @@ export const Main = () => {
               <Form.Control
                 type="email"
                 name="email"
-                value={customer.email}
+                value={user.email}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -293,7 +271,7 @@ export const Main = () => {
                 <Form.Control
                   type="password"
                   name="password"
-                  value={customer.password}
+                  value={user.password}
                   onChange={handleChange}
                   required
                 />
@@ -353,6 +331,6 @@ export const Main = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </Container>
+    </>
   );
 };

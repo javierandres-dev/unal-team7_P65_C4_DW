@@ -1,7 +1,7 @@
 {
-  "name": "usersms",
+  "name": "authms",
   "version": "0.0.1",
-  "description": "UsersMS",
+  "description": "AuthMS",
   "main": "src/server.js",
   "scripts": {
     "start": "node server.js",
