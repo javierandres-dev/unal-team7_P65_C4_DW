@@ -89,6 +89,7 @@ export const Admin = () => {
       setMsgForm("Todos los campos son obligatorios");
       return;
     }
+
     const res = await createOne(user);
     if (res.message === "Successfully") {
       setCta(null);
@@ -107,6 +108,8 @@ export const Admin = () => {
           lastName: currentCustomer.data.lastName,
           email: currentCustomer.data.email,
           password: currentCustomer.data.password,
+          isAdmin: currentCustomer.data.isAdmin,
+          accountNumber: currentCustomer.data.accountNumber,
         });
       }
     }
@@ -174,62 +177,64 @@ export const Admin = () => {
         <thead className="text-center">
           {users?.length > 0 ? (
             <tr>
-              <th>#</th>
               <th>Cliente</th>
               <th>Opciones</th>
             </tr>
           ) : (
             <tr>
-              <td colSpan="3"></td>
+              <td colSpan="2"></td>
             </tr>
           )}
         </thead>
         <tbody>
           {users?.length > 0 ? (
-            users.map((user, idx) => {
-              return (
-                <tr key={user.id}>
-                  <td>{idx + 1}</td>
-                  <td>{`${user.firstName} ${user.lastName}`}</td>
-                  <td className="text-center">
-                    <Button
-                      variant="info"
-                      size="sm"
-                      onClick={() => {
-                        setId(user.id);
-                        setCta("read");
-                      }}
-                    >
-                      Ver más...
-                    </Button>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      className="mx-3"
-                      onClick={() => {
-                        setId(user.id);
-                        setCta("update");
-                      }}
-                    >
-                      Actualizar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => {
-                        setId(user.id);
-                        setCta("delete");
-                      }}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              );
+            users.map((user) => {
+              if (user.isAdmin) {
+                return null;
+              } else {
+                return (
+                  <tr key={user.id}>
+                    <td>{`${user.firstName} ${user.lastName}`}</td>
+                    <td className="text-center">
+                      <Button
+                        variant="info"
+                        size="sm"
+                        onClick={() => {
+                          setId(user.id);
+                          setCta("read");
+                        }}
+                      >
+                        Ver más...
+                      </Button>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        className="mx-3"
+                        onClick={() => {
+                          setId(user.id);
+                          setCta("update");
+                        }}
+                      >
+                        Actualizar
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          setId(user.id);
+                          setCta("delete");
+                        }}
+                      >
+                        Eliminar
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              }
             })
           ) : (
             <tr className="text-center">
-              <td colSpan="3">Sin clientes</td>
+              <td colSpan="2">Sin clientes</td>
             </tr>
           )}
         </tbody>
@@ -268,6 +273,12 @@ export const Admin = () => {
                 readOnly={cta === "read"}
               />
             </Form.Group>
+            {cta === "read" && (
+              <Form.Group className="mb-3" controlId="formBasicAccountNumber">
+                <Form.Label>Número de Cuenta</Form.Label>
+                <Form.Control type="text" value={user.accountNumber} readOnly />
+              </Form.Group>
+            )}
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control

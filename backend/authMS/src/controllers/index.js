@@ -18,6 +18,12 @@ exports.create = async (req, res) => {
     return;
   }
 
+  const isAdmin = req.body.isAdmin === true;
+  let accountNumber = null;
+  if (!isAdmin) {
+    accountNumber = Date.now();
+  }
+
   const hashPwd = await bcryptjs.hash(req.body.password, 1);
 
   const user = {
@@ -25,7 +31,8 @@ exports.create = async (req, res) => {
     lastName: req.body.lastName,
     email: req.body.email,
     password: hashPwd,
-    isAdmin: req.body.isAdmin || false,
+    isAdmin: isAdmin,
+    accountNumber: accountNumber,
   };
 
   Users.create(user)

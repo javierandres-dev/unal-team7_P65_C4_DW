@@ -31,6 +31,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN,
       allowNull: false,
     },
+    accountNumber: {
+      type: Sequelize.STRING,
+    }
   });
   return Users;
 };
