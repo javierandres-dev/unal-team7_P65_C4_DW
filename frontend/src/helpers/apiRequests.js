@@ -1,7 +1,6 @@
-const url = "http://localhost:4000/api/users";
+const url = "http://localhost:4000/auth";
 
 export const createOne = async (obj) => {
-  console.log(obj)
   return await fetch(url, {
     method: "POST",
     headers: {
@@ -15,7 +14,7 @@ export const createOne = async (obj) => {
     }),
   })
     .then((response) => {
-      console.log(response)
+      console.log(response);
       if (response.ok) {
         return response.json();
       } else {
@@ -24,7 +23,7 @@ export const createOne = async (obj) => {
     })
     .catch((error) => {
       console.error(error);
-      return {error: error}
+      return { error: error };
     });
 };
 
@@ -39,6 +38,27 @@ export const findAll = async () => {
     })
     .catch((error) => {
       console.error(error);
+    });
+};
+
+export const login = async (obj) => {
+  return await fetch(`${url}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(obj),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      return { error: error };
     });
 };
 

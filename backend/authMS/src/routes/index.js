@@ -4,6 +4,7 @@ const express = require("express");
 
 const router = express.Router();
 
+router.post("/login", controller.login);
 router.post("/", controller.create);
 router.get("/", controller.findAll);
 router.get("/:id", controller.findOne);
