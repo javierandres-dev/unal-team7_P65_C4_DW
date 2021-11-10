@@ -1,6 +1,22 @@
+import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 
-export const Login = ({ credentials, setCredentials, getWho }) => {
+export const Login = ({ credentials, setCredentials, getUser, setMsg }) => {
+  const [validated, setValidated] = useState(false);
+
+  const handleSubmit = (event) => {
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      setMsg("Todos los campos son obligatorios");
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      getUser(event);
+    }
+
+    setValidated(true);
+  };
+
   const handleChange = (e) => {
     setCredentials({
       ...credentials,
@@ -9,21 +25,28 @@ export const Login = ({ credentials, setCredentials, getWho }) => {
   };
 
   return (
-    <Form onSubmit={getWho}>
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Usuario</Form.Label>
-        <Form.Control type="email" name="username" onChange={handleChange} />
+        <Form.Control
+          type="email"
+          name="username"
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicPassword">
         <Form.Label>Contraseña</Form.Label>
-        <Form.Control type="password" name="password" onChange={handleChange} />
+        <Form.Control
+          type="password"
+          name="password"
+          onChange={handleChange}
+          required
+        />
       </Form.Group>
       <div className="d-grid gap-2">
         <Button variant="primary" size="lg" type="submit">
-          Entrar
-        </Button>
-        <Button variant="secondary" size="lg" type="button">
-          Registrarme
+          Ingresar
         </Button>
       </div>
     </Form>

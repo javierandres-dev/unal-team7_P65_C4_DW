@@ -1,4 +1,5 @@
 import {
+  findAll,
   createOne,
   findOne,
   updateOne,
@@ -18,7 +19,8 @@ const initialUser = {
   password: "",
 };
 
-export const Admin = ({ users, getFindAll }) => {
+export const Admin = () => {
+  const [users, setUsers] = useState(null);
   const [user, setUser] = useState(initialUser);
   const [id, setId] = useState(null);
   const [cta, setCta] = useState(null);
@@ -33,6 +35,18 @@ export const Admin = ({ users, getFindAll }) => {
 
   const closeQuestion = () => setQuestion(false);
   const showQuestion = () => setQuestion(true);
+
+  useEffect(() => {
+    getFindAll();
+  }, []);
+
+  const getFindAll = async () => {
+    const res = await findAll();
+    if (!res) return;
+    else if (res.message === "Successfully") {
+      setUsers(res.data);
+    }
+  };
 
   useEffect(() => {
     switch (cta) {

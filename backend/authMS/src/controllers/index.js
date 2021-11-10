@@ -1,8 +1,11 @@
 "use strict";
 const db = require("../models");
+const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
 const Users = db.users;
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   if (
     !req.body.firstName ||
     !req.body.lastName ||
@@ -15,11 +18,13 @@ exports.create = (req, res) => {
     return;
   }
 
+  const hashPwd = await bcryptjs.hash(req.body.password, 1);
+
   const user = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
-    password: req.body.password,
+    password: hashPwd,
     isAdmin: req.body.isAdmin || false,
   };
 
@@ -44,6 +49,37 @@ exports.findAll = (req, res) => {
         message: err.message || "Some error occured while retrieving Users",
       });
     });
+};
+
+exports.login = async (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    res.status(400).json({
+      message: "Content can not be empty!",
+    });
+    return;
+  }
+
+  try {
+    const user = await Users.findOne({ where: { email: req.body.username } });
+    if (user) {
+      if (await bcryptjs.compare(req.body.password, user.password)) {
+        const payload = {
+          id: user.id,
+          check: true,
+        };
+        const token = jwt.sign(payload, "shhhhh", {
+          expiresIn: "3600000",
+        });
+        res.json({ message: "Successfully", token: token });
+      } else {
+        res.status(400).json({ message: "Incorrect username and/or password" });
+      }
+    } else {
+      res.status(400).json({ message: "Incorrect username and/or password" });
+    }
+  } catch (err) {
+    res.status(err).json(err);
+  }
 };
 
 exports.findOne = (req, res) => {

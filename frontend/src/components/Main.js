@@ -1,9 +1,12 @@
-import { findAll } from "../helpers/apiRequests";
+import { decodeToken } from "react-jwt";
+import { findOne, login } from "../helpers/apiRequests";
 import { Badge, Container } from "react-bootstrap";
 import { Login } from "./Login";
 import { Admin } from "./Admin";
 import { Customer } from "./Customer";
 import { useEffect, useState } from "react";
+import { Header } from "./Header";
+import { Aside } from "./Aside";
 
 const initialCredentials = {
   username: "",
@@ -11,56 +14,93 @@ const initialCredentials = {
 };
 
 export const Main = () => {
-  const [users, setUsers] = useState(null);
   const [credentials, setCredentials] = useState(initialCredentials);
-  const [isLogged, setIsLogged] = useState(false);
-  const [who, setWho] = useState(null);
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    getFindAll();
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = decodeToken(token);
+      (async () => {
+        const u = await findOne(decoded.id);
+        if (u.message === "Successfully") {
+          setUser(u.data);
+        }
+      })();
+    }
   }, []);
 
-  const getFindAll = async () => {
-    const res = await findAll();
-    if (!res) return;
-    else if (res.message === "Successfully") {
-      setUsers(res.data);
+  useEffect(() => {
+    if (msg) {
+      setTimeout(() => {
+        setMsg(null);
+      }, 3000);
     }
+  }, [msg]);
+
+  useEffect(() => {
+    if (user) {
+      if (user.isAdmin === true) {
+        setProfile("Administradores");
+      }
+      if (user.isAdmin === false) {
+        setProfile("Clientes");
+      }
+    }
+  }, [user]);
+
+  const getUser = (e) => {
+    e.preventDefault();
+    (async () => {
+      if (credentials.username && credentials.password) {
+        const res = await login(credentials);
+        if (res.message === "Successfully") {
+          if (!res.token) {
+            setMsg("Usuario no registrado, contacte un asesor");
+          } else {
+            localStorage.setItem("token", res.token);
+            const decoded = decodeToken(res.token);
+            const u = await findOne(decoded.id);
+            if (u.message === "Successfully") {
+              setUser(u.data);
+            }
+          }
+        }
+      }
+    })();
   };
 
-  const getWho = (e) => {
-    e.preventDefault();
-    console.log("working...", credentials);
-    const res = users.filter((el) => el.email === credentials.username);
-    console.log(res);
-    if (res.length === 1) {
-      if (res[0].isAdmin) {
-        setWho("admin");
-      } else {
-        setWho("customer");
-      }
-      setIsLogged(true);
-    }
+  const logout = () => {
+    localStorage.clear();
+    setCredentials(initialCredentials);
+    setUser(null);
+    setProfile(null);
+    setMsg("Sesión finalizada");
   };
-  console.log(who);
+
   return (
-    <Container className="my-5">
-      <h1 className="text-center">
-        <Badge bg="success" className="mx-2">
-          The Greens | Bank
-        </Badge>
-      </h1>
-      {!isLogged && (
-        <Login
-          credentials={credentials}
-          setCredentials={setCredentials}
-          getWho={getWho}
-        />
-      )}
-      {isLogged && who === "admin" && (
-        <Admin users={users} getFindAll={getFindAll} />
-      )}
-      {isLogged && who === "customer" && <Customer />}
-    </Container>
+    <>
+      <Header user={user} profile={profile} logout={logout} />
+      <Container className="my-5">
+        <h1 className="text-center">
+          <Badge bg="success" className="mx-2">
+            The Greens | Bank
+          </Badge>
+        </h1>
+        {!user && (
+          <Login
+            credentials={credentials}
+            setCredentials={setCredentials}
+            getUser={getUser}
+            setMsg={setMsg}
+          />
+        )}
+        {profile === "Administradores" && <Admin />}
+        {profile === "Clientes" && <Customer />}
+      </Container>
+      <Aside msg={msg} />
+    </>
   );
 };

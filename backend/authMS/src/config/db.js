@@ -3,6 +3,6 @@ module.exports = {
   HOST: "localhost",
   USER: "admin",
   PASSWORD: "123456",
-  DB: "dbAuth",
+  DB: "authDB",
   dialect: "postgres",
 };

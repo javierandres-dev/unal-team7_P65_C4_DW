@@ -12,7 +12,7 @@ const server = express();
 
 server.use(cors());
 server.use(express.json());
-server.use("/api/users", routes);
+server.use("/auth", routes);
 
 server.get("/", (req, res) => {
   res.json({ message: "Works!" });
