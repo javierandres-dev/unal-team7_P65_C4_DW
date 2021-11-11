@@ -1,5 +1,5 @@
 import { decodeToken } from "react-jwt";
-import { findOne, login } from "../helpers/apiRequests";
+import { findOne, login } from "../helpers/apiGateway";
 import { Badge, Container } from "react-bootstrap";
 import { Login } from "./Login";
 import { Admin } from "./Admin";
@@ -57,16 +57,14 @@ export const Main = () => {
       if (credentials.username && credentials.password) {
         const res = await login(credentials);
         if (res.message === "Successfully") {
-          if (!res.token) {
-            setMsg("Usuario no registrado, contacte un asesor");
-          } else {
-            localStorage.setItem("token", res.token);
-            const decoded = decodeToken(res.token);
-            const u = await findOne(decoded.id);
-            if (u.message === "Successfully") {
-              setUser(u.data);
-            }
+          localStorage.setItem("token", res.token);
+          const decoded = decodeToken(res.token);
+          const u = await findOne(decoded.id);
+          if (u.message === "Successfully") {
+            setUser(u.data);
           }
+        } else {
+          setMsg("Usuario y/o contraseña incorrectos");
         }
       }
     })();
@@ -98,7 +96,9 @@ export const Main = () => {
           />
         )}
         {profile === "Administradores" && <Admin />}
-        {profile === "Clientes" && <Customer accountNumber={user.accountNumber} />}
+        {profile === "Clientes" && (
+          <Customer accountNumber={user.accountNumber} />
+        )}
       </Container>
       <Aside msg={msg} />
     </>
