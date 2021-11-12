@@ -53,7 +53,7 @@ export const login = async (obj) => {
     if (res.ok) {
       return res.json();
     } else {
-      const j = await res.json()
+      const j = await res.json();
       throw new Error(j.message);
     }
   } catch (error) {

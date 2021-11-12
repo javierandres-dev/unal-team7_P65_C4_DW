@@ -104,7 +104,6 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) => {
   const id = req.params.id;
-
   Users.update(req.body, {
     where: { id: id },
   }).then((data) => {

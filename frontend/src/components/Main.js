@@ -84,7 +84,7 @@ export const Main = () => {
       <Container className="my-5">
         <h1 className="text-center">
           <Badge bg="success" className="mx-2">
-            The Greens | Bank
+            TEAM7 | Bank
           </Badge>
         </h1>
         {!user && (

@@ -74,22 +74,6 @@ export const Admin = () => {
   }, [cta]);
 
   const createCustomer = async (e) => {
-    e.preventDefault();
-    const fields = e.currentTarget;
-    if (fields.checkValidity() === false) {
-      e.stopPropagation();
-    }
-    setValidated(true);
-    if (
-      user.firstName === "" ||
-      user.lastName === "" ||
-      user.email === "" ||
-      user.password === ""
-    ) {
-      setMsgForm("Todos los campos son obligatorios");
-      return;
-    }
-
     const res = await createOne(user);
     if (res.message === "Successfully") {
       setCta(null);
@@ -116,22 +100,9 @@ export const Admin = () => {
   };
 
   const updateCustomer = async (e) => {
-    e.preventDefault();
-    const fields = e.currentTarget;
-    if (fields.checkValidity() === false) {
-      e.stopPropagation();
-    }
-    setValidated(true);
-    if (
-      user.firstName === "" ||
-      user.lastName === "" ||
-      user.email === "" ||
-      user.password === ""
-    ) {
-      setMsgForm("Todos los campos son obligatorios");
-      return;
-    }
+    console.log(id, user);
     const res = await updateOne(id, user);
+    console.log(res);
     if (res.message === "Successfully") {
       setId(null);
       setCta(null);
@@ -159,6 +130,19 @@ export const Admin = () => {
       ...user,
       [name]: value,
     });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const f = e.currentTarget;
+    if (f.checkValidity() === false) {
+      setMsgForm("Todos los campos son obligatorios");
+      e.stopPropagation();
+    } else {
+      id ? updateCustomer() : createCustomer();
+    }
+
+    setValidated(true);
   };
 
   return (
@@ -250,7 +234,7 @@ export const Admin = () => {
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form noValidate validated={validated}>
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formBasicFirstName">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
@@ -303,11 +287,7 @@ export const Admin = () => {
               </Form.Group>
             )}
             {cta === "read" ? null : (
-              <Button
-                variant="primary"
-                type="submit"
-                onClick={id ? updateCustomer : createCustomer}
-              >
+              <Button variant="primary" type="submit">
                 {id ? "Guardar cambios" : "Agregar"}
               </Button>
             )}
