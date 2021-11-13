@@ -20,12 +20,12 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true,
     },
-    date: {
-      type: Sequelize.DATE,
-      allowNull: false,
-    },
     initialDeposit: {
       type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    dateInitialDeposit: {
+      type: Sequelize.STRING,
       allowNull: false,
     },
     activity: {

@@ -15,7 +15,7 @@ server.use(express.json());
 server.use("/auth", routes);
 
 server.get("/", (req, res) => {
-  res.json({ message: "Works!" });
+  res.json({ message: "Auth Works!" });
 });
 
 server.listen(port, () => {

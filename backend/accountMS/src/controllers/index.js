@@ -3,14 +3,16 @@ const db = require("../models");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const Users = db.users;
+const Accounts = db.accounts;
 
 exports.create = async (req, res) => {
   if (
-    !req.body.firstName ||
-    !req.body.lastName ||
-    !req.body.email ||
-    !req.body.password
+    !req.body.userId ||
+    !req.body.accountNumber ||
+    !req.body.initialDeposit ||
+    !req.body.dateInitialDeposit ||
+    !req.body.activity ||
+    !req.body.endingBalance
   ) {
     res.status(400).json({
       message: "Content can not be empty!",
@@ -18,36 +20,28 @@ exports.create = async (req, res) => {
     return;
   }
 
-  const isAdmin = req.body.isAdmin === true;
-  let accountNumber = null;
-  if (!isAdmin) {
-    accountNumber = Date.now();
-  }
-
-  const hashPwd = await bcryptjs.hash(req.body.password, 1);
-
-  const user = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: hashPwd,
-    isAdmin: isAdmin,
-    accountNumber: accountNumber,
+  const account = {
+    userId: req.body.userId,
+    accountNumber: req.body.accountNumber,
+    initialDeposit: req.body.initialDeposit,
+    dateInitialDeposit: req.body.dateInitialDeposit,
+    activity: req.body.activity,
+    endingBalance: req.body.endingBalance,
   };
 
-  Users.create(user)
+  Accounts.create(account)
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
     .catch((err) => {
       res.status(500).json({
-        message: err.message || "Some error occurred while create the Users",
+        message: err.message || "Some error occurred while create the Account",
       });
     });
 };
 
 exports.findAll = (req, res) => {
-  Users.findAll()
+  Accounts.findAll()
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
@@ -57,7 +51,7 @@ exports.findAll = (req, res) => {
       });
     });
 };
-
+/*
 exports.signup = async (req, res) => {
   if (!req.body.username || !req.body.password) {
     res.status(400).json({
@@ -88,10 +82,10 @@ exports.signup = async (req, res) => {
     res.status(err).json(err);
   }
 };
-
+*/
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  Users.findByPk(id)
+  Accounts.findOne({ where: { userId: id } })
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
@@ -104,7 +98,7 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) => {
   const id = req.params.id;
-  Users.update(req.body, {
+  Accounts.update(req.body, {
     where: { id: id },
   }).then((data) => {
     if (data) {
@@ -123,7 +117,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
   const id = req.params.id;
 
-  Users.destroy({
+  Accounts.destroy({
     where: { id: id },
   }).then((data) => {
     if (data) {

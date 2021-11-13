@@ -4,6 +4,7 @@ import {
   findOne,
   updateOne,
   deleteOne,
+  createAccount,
 } from "../helpers/apiGateway";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -17,6 +18,7 @@ const initialUser = {
   lastName: "",
   email: "",
   password: "",
+  initialDeposit: "",
 };
 
 export const Admin = () => {
@@ -75,7 +77,19 @@ export const Admin = () => {
 
   const createCustomer = async (e) => {
     const res = await createOne(user);
+    console.log("res: ", res);
     if (res.message === "Successfully") {
+      let dateInitialDeposit = new Date(res.data.initialDeposit);
+      dateInitialDeposit = dateInitialDeposit.toLocaleString();
+      const r = await createAccount({
+        userId: res.data.id,
+        accountNumber: res.data.accountNumber,
+        initialDeposit: res.data.initialDeposit,
+        dateInitialDeposit: dateInitialDeposit,
+        activity: "Apertura de cuenta",
+        endingBalance: res.data.initialDeposit,
+      });
+      console.log("r: ", r);
       setCta(null);
       setTitle(null);
       closeForm();
@@ -94,15 +108,14 @@ export const Admin = () => {
           password: currentCustomer.data.password,
           isAdmin: currentCustomer.data.isAdmin,
           accountNumber: currentCustomer.data.accountNumber,
+          initialDeposit: currentCustomer.data.initialDeposit,
         });
       }
     }
   };
 
   const updateCustomer = async (e) => {
-    console.log(id, user);
     const res = await updateOne(id, user);
-    console.log(res);
     if (res.message === "Successfully") {
       setId(null);
       setCta(null);
@@ -263,6 +276,17 @@ export const Admin = () => {
                 <Form.Control type="text" value={user.accountNumber} readOnly />
               </Form.Group>
             )}
+            <Form.Group className="mb-3" controlId="formBasicDeposit">
+              <Form.Label>Deposito Inicial</Form.Label>
+              <Form.Control
+                type="number"
+                name="initialDeposit"
+                value={user.initialDeposit}
+                onChange={handleChange}
+                required
+                readOnly={cta === "read" || cta === "update"}
+              />
+            </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control

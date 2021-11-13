@@ -1,4 +1,5 @@
 const urlAuth = "http://localhost:4000/auth";
+const urlAccount = "http://localhost:5000/account";
 
 export const createOne = async (obj) => {
   return await fetch(urlAuth, {
@@ -6,15 +7,9 @@ export const createOne = async (obj) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      firstName: obj.firstName,
-      lastName: obj.lastName,
-      email: obj.email,
-      password: obj.password,
-    }),
+    body: JSON.stringify(obj),
   })
     .then((response) => {
-      console.log(response);
       if (response.ok) {
         return response.json();
       } else {
@@ -39,27 +34,6 @@ export const findAll = async () => {
     .catch((error) => {
       console.error(error);
     });
-};
-
-export const login = async (obj) => {
-  try {
-    const res = await fetch(`${urlAuth}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(obj),
-    });
-    if (res.ok) {
-      return res.json();
-    } else {
-      const j = await res.json();
-      throw new Error(j.message);
-    }
-  } catch (error) {
-    console.error(error);
-    return { error: error };
-  }
 };
 
 export const findOne = async (id) => {
@@ -105,6 +79,63 @@ export const deleteOne = async (id) => {
   return await fetch(`${urlAuth}/${id}`, {
     method: "DELETE",
   })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const login = async (obj) => {
+  try {
+    const res = await fetch(`${urlAuth}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(obj),
+    });
+    if (res.ok) {
+      return res.json();
+    } else {
+      const j = await res.json();
+      throw new Error(j.message);
+    }
+  } catch (error) {
+    console.error(error);
+    return { error: error };
+  }
+};
+
+export const createAccount = async (obj) => {
+  console.log("createAccount - obj: ", obj);
+  return await fetch(urlAccount, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(obj),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      return { error: error };
+    });
+};
+
+export const findAccount = async (id) => {
+  return await fetch(`${urlAccount}/${id}`)
     .then((response) => {
       if (response.ok) {
         return response.json();

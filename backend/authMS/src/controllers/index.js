@@ -20,8 +20,10 @@ exports.create = async (req, res) => {
 
   const isAdmin = req.body.isAdmin === true;
   let accountNumber = null;
+  let initialDeposit = null;
   if (!isAdmin) {
     accountNumber = Date.now();
+    initialDeposit = req.body.initialDeposit;
   }
 
   const hashPwd = await bcryptjs.hash(req.body.password, 1);
@@ -33,6 +35,7 @@ exports.create = async (req, res) => {
     password: hashPwd,
     isAdmin: isAdmin,
     accountNumber: accountNumber,
+    initialDeposit: initialDeposit,
   };
 
   Users.create(user)
