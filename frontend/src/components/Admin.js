@@ -17,6 +17,7 @@ const initialUser = {
   lastName: "",
   email: "",
   password: "",
+  initialDeposit: "",
 };
 
 export const Admin = () => {
@@ -94,15 +95,14 @@ export const Admin = () => {
           password: currentCustomer.data.password,
           isAdmin: currentCustomer.data.isAdmin,
           accountNumber: currentCustomer.data.accountNumber,
+          initialDeposit: currentCustomer.data.initialDeposit,
         });
       }
     }
   };
 
   const updateCustomer = async (e) => {
-    console.log(id, user);
     const res = await updateOne(id, user);
-    console.log(res);
     if (res.message === "Successfully") {
       setId(null);
       setCta(null);
@@ -263,6 +263,17 @@ export const Admin = () => {
                 <Form.Control type="text" value={user.accountNumber} readOnly />
               </Form.Group>
             )}
+            <Form.Group className="mb-3" controlId="formBasicDeposit">
+              <Form.Label>Deposito Inicial</Form.Label>
+              <Form.Control
+                type="number"
+                name="initialDeposit"
+                value={user.initialDeposit}
+                onChange={handleChange}
+                required
+                readOnly={cta === "read" || cta === "update"}
+              />
+            </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control

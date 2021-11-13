@@ -1,4 +1,5 @@
 const urlAuth = "http://localhost:4000/auth";
+const urlAccount = "http://localhost:5000/account";
 
 export const createOne = async (obj) => {
   return await fetch(urlAuth, {
@@ -6,17 +7,20 @@ export const createOne = async (obj) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      firstName: obj.firstName,
-      lastName: obj.lastName,
-      email: obj.email,
-      password: obj.password,
-    }),
+    body: JSON.stringify(obj),
   })
     .then((response) => {
-      console.log(response);
       if (response.ok) {
-        return response.json();
+        const json = response.json();
+        console.log(json);
+        /* createAccount({
+          userId: json.id,
+          accountNumber: json.accountNumber,
+          initialDeposit: json.initialDeposit,
+          activity: "=",
+          endingBalance: json.initialDeposit,
+        }); */
+        return json;
       } else {
         throw new Error("Something went wrong");
       }

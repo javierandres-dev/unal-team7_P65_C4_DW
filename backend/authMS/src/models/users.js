@@ -33,7 +33,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     accountNumber: {
       type: Sequelize.STRING,
-    }
+    },
+    initialDeposit: {
+      type: Sequelize.INTEGER,
+    },
   });
   return Users;
 };

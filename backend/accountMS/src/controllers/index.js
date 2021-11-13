@@ -3,14 +3,15 @@ const db = require("../models");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const Users = db.users;
+const Accounts = db.accounts;
 
 exports.create = async (req, res) => {
   if (
-    !req.body.firstName ||
-    !req.body.lastName ||
-    !req.body.email ||
-    !req.body.password
+    !req.body.userId ||
+    !req.body.accountNumber ||
+    !req.body.initialDeposit ||
+    !req.body.activity ||
+    !req.body.endingBalance
   ) {
     res.status(400).json({
       message: "Content can not be empty!",
@@ -18,34 +19,29 @@ exports.create = async (req, res) => {
     return;
   }
 
-  const isAdmin = req.body.isAdmin === true;
-  let accountNumber = null;
-  if (!isAdmin) {
-    accountNumber = Date.now();
-  }
+  let dateInitialDeposit = new Date(initialDeposit);
+  dateInitialDeposit = dateInitialDeposit.toLocaleString();
 
-  const hashPwd = await bcryptjs.hash(req.body.password, 1);
-
-  const user = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    password: hashPwd,
-    isAdmin: isAdmin,
-    accountNumber: accountNumber,
+  const account = {
+    userId: req.body.userId,
+    accountNumber: req.body.accountNumber,
+    initialDeposit: req.body.initialDeposit,
+    activity: req.body.activity,
+    endingBalance: req.body.endingBalance,
+    dateInitialDeposit: dateInitialDeposit,
   };
 
-  Users.create(user)
+  Accounts.create(account)
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
     .catch((err) => {
       res.status(500).json({
-        message: err.message || "Some error occurred while create the Users",
+        message: err.message || "Some error occurred while create the Account",
       });
     });
 };
-
+/*
 exports.findAll = (req, res) => {
   Users.findAll()
     .then((data) => {
@@ -138,3 +134,4 @@ exports.delete = (req, res) => {
     }
   });
 };
+*/
