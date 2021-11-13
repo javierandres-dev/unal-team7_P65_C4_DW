@@ -4,7 +4,7 @@ const express = require("express");
 
 const router = express.Router();
 
-router.post("/signup", controller.signup);
+//router.post("/signup", controller.signup);
 router.post("/", controller.create);
 router.get("/", controller.findAll);
 router.get("/:id", controller.findOne);

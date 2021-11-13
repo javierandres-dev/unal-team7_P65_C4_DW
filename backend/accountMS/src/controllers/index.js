@@ -10,6 +10,7 @@ exports.create = async (req, res) => {
     !req.body.userId ||
     !req.body.accountNumber ||
     !req.body.initialDeposit ||
+    !req.body.dateInitialDeposit ||
     !req.body.activity ||
     !req.body.endingBalance
   ) {
@@ -19,16 +20,13 @@ exports.create = async (req, res) => {
     return;
   }
 
-  let dateInitialDeposit = new Date(initialDeposit);
-  dateInitialDeposit = dateInitialDeposit.toLocaleString();
-
   const account = {
     userId: req.body.userId,
     accountNumber: req.body.accountNumber,
     initialDeposit: req.body.initialDeposit,
+    dateInitialDeposit: req.body.dateInitialDeposit,
     activity: req.body.activity,
     endingBalance: req.body.endingBalance,
-    dateInitialDeposit: dateInitialDeposit,
   };
 
   Accounts.create(account)
@@ -41,9 +39,9 @@ exports.create = async (req, res) => {
       });
     });
 };
-/*
+
 exports.findAll = (req, res) => {
-  Users.findAll()
+  Accounts.findAll()
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
@@ -53,7 +51,7 @@ exports.findAll = (req, res) => {
       });
     });
 };
-
+/*
 exports.signup = async (req, res) => {
   if (!req.body.username || !req.body.password) {
     res.status(400).json({
@@ -84,10 +82,10 @@ exports.signup = async (req, res) => {
     res.status(err).json(err);
   }
 };
-
+*/
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  Users.findByPk(id)
+  Accounts.findOne({ where: { userId: id } })
     .then((data) => {
       res.json({ message: "Successfully", data: data });
     })
@@ -100,7 +98,7 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) => {
   const id = req.params.id;
-  Users.update(req.body, {
+  Accounts.update(req.body, {
     where: { id: id },
   }).then((data) => {
     if (data) {
@@ -119,7 +117,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
   const id = req.params.id;
 
-  Users.destroy({
+  Accounts.destroy({
     where: { id: id },
   }).then((data) => {
     if (data) {
@@ -134,4 +132,3 @@ exports.delete = (req, res) => {
     }
   });
 };
-*/

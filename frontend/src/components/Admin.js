@@ -4,6 +4,7 @@ import {
   findOne,
   updateOne,
   deleteOne,
+  createAccount,
 } from "../helpers/apiGateway";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -76,7 +77,19 @@ export const Admin = () => {
 
   const createCustomer = async (e) => {
     const res = await createOne(user);
+    console.log("res: ", res);
     if (res.message === "Successfully") {
+      let dateInitialDeposit = new Date(res.data.initialDeposit);
+      dateInitialDeposit = dateInitialDeposit.toLocaleString();
+      const r = await createAccount({
+        userId: res.data.id,
+        accountNumber: res.data.accountNumber,
+        initialDeposit: res.data.initialDeposit,
+        dateInitialDeposit: dateInitialDeposit,
+        activity: "Apertura de cuenta",
+        endingBalance: res.data.initialDeposit,
+      });
+      console.log("r: ", r);
       setCta(null);
       setTitle(null);
       closeForm();
