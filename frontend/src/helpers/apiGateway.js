@@ -134,6 +134,20 @@ export const createAccount = async (obj) => {
     });
 };
 
+export const findAccounts = async () => {
+  return await fetch(urlAccount)
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Something went wrong");
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
 export const findAccount = async (id) => {
   return await fetch(`${urlAccount}/${id}`)
     .then((response) => {

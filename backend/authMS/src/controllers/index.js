@@ -18,11 +18,20 @@ exports.create = async (req, res) => {
     return;
   }
 
+  const startDate = new Date();
   const isAdmin = req.body.isAdmin === true;
-  let accountNumber = null;
+
+  let accountId = null;
   let initialDeposit = null;
+
   if (!isAdmin) {
-    accountNumber = Date.now();
+    if (!req.body.initialDeposit) {
+      res.status(400).json({
+        message: "Content can not be empty!",
+      });
+      return;
+    }
+    accountId = Date.now();
     initialDeposit = req.body.initialDeposit;
   }
 
@@ -33,8 +42,9 @@ exports.create = async (req, res) => {
     lastName: req.body.lastName,
     email: req.body.email,
     password: hashPwd,
+    startDate: startDate.toString(),
     isAdmin: isAdmin,
-    accountNumber: accountNumber,
+    accountId: accountId,
     initialDeposit: initialDeposit,
   };
 

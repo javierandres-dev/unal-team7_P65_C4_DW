@@ -6,12 +6,11 @@ const jwt = require("jsonwebtoken");
 const Accounts = db.accounts;
 
 exports.create = async (req, res) => {
+  console.log("create: ", req.body);
   if (
+    !req.body.id ||
     !req.body.userId ||
-    !req.body.accountNumber ||
-    !req.body.initialDeposit ||
-    !req.body.dateInitialDeposit ||
-    !req.body.activity ||
+    !req.body.activities ||
     !req.body.endingBalance
   ) {
     res.status(400).json({
@@ -21,11 +20,9 @@ exports.create = async (req, res) => {
   }
 
   const account = {
+    id: req.body.id,
     userId: req.body.userId,
-    accountNumber: req.body.accountNumber,
-    initialDeposit: req.body.initialDeposit,
-    dateInitialDeposit: req.body.dateInitialDeposit,
-    activity: req.body.activity,
+    activities: req.body.activities,
     endingBalance: req.body.endingBalance,
   };
 
@@ -51,38 +48,67 @@ exports.findAll = (req, res) => {
       });
     });
 };
-/*
-exports.signup = async (req, res) => {
-  if (!req.body.username || !req.body.password) {
+
+exports.transfer = async (req, res) => {
+  if (
+    !req.body.activity ||
+    !req.body.date ||
+    !req.body.origin ||
+    !req.body.destination ||
+    !req.body.amount
+  ) {
     res.status(400).json({
       message: "Content can not be empty!",
     });
     return;
   }
-
+  if (req.body.origin === req.body.destination) {
+    res.status(400).json({
+      message: "Destination can not be origin!",
+    });
+    return;
+  }
   try {
-    const user = await Users.findOne({ where: { email: req.body.username } });
-    if (user) {
-      if (await bcryptjs.compare(req.body.password, user.password)) {
-        const payload = {
-          id: user.id,
-          check: true,
+    let origin = null;
+    await Accounts.findOne({
+      where: { id: req.body.origin },
+    })
+      .then((data) => {
+        origin = data.dataValues;
+      })
+      .catch((err) => {
+        origin = {
+          message: `Error retrieving origin with id ${id}`,
         };
-        const token = jwt.sign(payload, "shhhhh", {
-          expiresIn: "3600000",
+      });
+    if (origin.endingBalance - req.body.amount >= 0) {
+      let destination = null;
+      await Accounts.findOne({
+        where: { id: req.body.destination },
+      })
+        .then((data) => {
+          destination = data.dataValues;
+        })
+        .catch((err) => {
+          destination = {
+            message: `Error retrieving destination with id ${id}`,
+          };
         });
-        res.json({ message: "Successfully", token: token });
-      } else {
-        res.status(400).json({ message: "Incorrect username and/or password" });
-      }
+      //origin.activities.push(req.body);
+      //destination.activities.push(req.body);
+      console.log("req.body: ", req.body);
+      console.log("origin: ", origin);
+      console.log("destination: ", destination);
+      console.log("END working....");
+      res.json({ message: "soon..."});
     } else {
-      res.status(400).json({ message: "Incorrect username and/or password" });
+      res.status(400).json({ message: "Insufficient funds BACK" });
     }
   } catch (err) {
     res.status(err).json(err);
   }
 };
-*/
+
 exports.findOne = (req, res) => {
   const id = req.params.id;
   Accounts.findOne({ where: { userId: id } })

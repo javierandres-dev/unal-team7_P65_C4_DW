@@ -21,7 +21,7 @@ const initialUser = {
   initialDeposit: "",
 };
 
-export const Admin = () => {
+export const Admin = ({ setMsg }) => {
   const [users, setUsers] = useState(null);
   const [user, setUser] = useState(initialUser);
   const [id, setId] = useState(null);
@@ -41,6 +41,10 @@ export const Admin = () => {
   useEffect(() => {
     getFindAll();
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => setMsgForm(null), 3000);
+  }, [msgForm]);
 
   const getFindAll = async () => {
     const res = await findAll();
@@ -77,19 +81,25 @@ export const Admin = () => {
 
   const createCustomer = async (e) => {
     const res = await createOne(user);
-    console.log("res: ", res);
     if (res.message === "Successfully") {
-      let dateInitialDeposit = new Date(res.data.initialDeposit);
-      dateInitialDeposit = dateInitialDeposit.toLocaleString();
       const r = await createAccount({
         userId: res.data.id,
-        accountNumber: res.data.accountNumber,
-        initialDeposit: res.data.initialDeposit,
-        dateInitialDeposit: dateInitialDeposit,
-        activity: "Apertura de cuenta",
+        id: res.data.accountId,
+        activities: [
+          {
+            activity: "Apertura de cuenta",
+            date: res.data.startDate,
+            origin: "Depósito inicial",
+            destination: "Depósito inicial",
+            amount: res.data.initialDeposit,
+          },
+        ],
         endingBalance: res.data.initialDeposit,
       });
       console.log("r: ", r);
+      if (r.message === "Successfully") {
+        setMsg("Cuenta creada satisfactoriamente");
+      }
       setCta(null);
       setTitle(null);
       closeForm();
@@ -101,15 +111,18 @@ export const Admin = () => {
     if (id) {
       const currentCustomer = await findOne(id);
       if (currentCustomer.message === "Successfully") {
-        setUser({
+        setUser(currentCustomer.data);
+        /* setUser({
           firstName: currentCustomer.data.firstName,
           lastName: currentCustomer.data.lastName,
           email: currentCustomer.data.email,
           password: currentCustomer.data.password,
+          startDate: currentCustomer.data.startDate,
           isAdmin: currentCustomer.data.isAdmin,
-          accountNumber: currentCustomer.data.accountNumber,
+          accountId: currentCustomer.data.accountId,
           initialDeposit: currentCustomer.data.initialDeposit,
-        });
+          endingBalance: currentCustomer.data.endingBalance,
+        }); */
       }
     }
   };
@@ -157,7 +170,7 @@ export const Admin = () => {
 
     setValidated(true);
   };
-
+  console.log("user: ", user);
   return (
     <>
       <Button
@@ -271,22 +284,34 @@ export const Admin = () => {
               />
             </Form.Group>
             {cta === "read" && (
-              <Form.Group className="mb-3" controlId="formBasicAccountNumber">
-                <Form.Label>Número de Cuenta</Form.Label>
-                <Form.Control type="text" value={user.accountNumber} readOnly />
+              <>
+                <Form.Group className="mb-3" controlId="formBasicAccountDate">
+                  <Form.Label>Fecha de apertura de cuenta</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={user.startDate?.slice(3, 24)}
+                    readOnly
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicAccountNumber">
+                  <Form.Label>Número de Cuenta</Form.Label>
+                  <Form.Control type="text" value={user.accountId} readOnly />
+                </Form.Group>
+              </>
+            )}
+            {cta !== "update" && (
+              <Form.Group className="mb-3" controlId="formBasicDeposit">
+                <Form.Label>Deposito Inicial</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="initialDeposit"
+                  value={user.initialDeposit}
+                  onChange={handleChange}
+                  required
+                  readOnly={cta === "read"}
+                />
               </Form.Group>
             )}
-            <Form.Group className="mb-3" controlId="formBasicDeposit">
-              <Form.Label>Deposito Inicial</Form.Label>
-              <Form.Control
-                type="number"
-                name="initialDeposit"
-                value={user.initialDeposit}
-                onChange={handleChange}
-                required
-                readOnly={cta === "read" || cta === "update"}
-              />
-            </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control

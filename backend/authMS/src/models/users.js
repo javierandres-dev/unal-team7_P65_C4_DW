@@ -27,11 +27,15 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
+    startDate: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     isAdmin: {
       type: Sequelize.BOOLEAN,
       allowNull: false,
     },
-    accountNumber: {
+    accountId: {
       type: Sequelize.STRING,
     },
     initialDeposit: {

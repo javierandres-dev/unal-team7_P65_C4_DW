@@ -95,7 +95,7 @@ export const Main = () => {
             setMsg={setMsg}
           />
         )}
-        {profile === "Administradores" && <Admin />}
+        {profile === "Administradores" && <Admin setMsg={setMsg} />}
         {profile === "Clientes" && <Customer user={user} />}
       </Container>
       <Aside msg={msg} />

@@ -4,9 +4,8 @@ const { sequelize, Sequelize } = require(".");
 module.exports = (sequelize, Sequelize) => {
   const Accounts = sequelize.define("accounts", {
     id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       primaryKey: true,
-      autoIncrement: true,
       allowNull: false,
       unique: true,
     },
@@ -15,22 +14,14 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true,
     },
-    accountNumber: {
+    activities: {
       type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    initialDeposit: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    },
-    dateInitialDeposit: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    activity: {
-      type: Sequelize.STRING,
-      allowNull: false,
+      get: function () {
+        return JSON.parse(this.getDataValue("activities"));
+      },
+      set: function (val) {
+        return this.setDataValue("activities", JSON.stringify(val));
+      },
     },
     endingBalance: {
       type: Sequelize.INTEGER,
