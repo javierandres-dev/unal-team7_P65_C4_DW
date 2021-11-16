@@ -15,13 +15,9 @@ module.exports = (sequelize, Sequelize) => {
       unique: true,
     },
     activities: {
-      type: Sequelize.STRING,
-      get: function () {
-        return JSON.parse(this.getDataValue("activities"));
-      },
-      set: function (val) {
-        return this.setDataValue("activities", JSON.stringify(val));
-      },
+      type: Sequelize.ARRAY(Sequelize.JSON),
+      allowNull: false,
+      defaultValue: [],
     },
     endingBalance: {
       type: Sequelize.INTEGER,

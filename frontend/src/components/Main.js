@@ -1,5 +1,5 @@
 import { decodeToken } from "react-jwt";
-import { findOne, login } from "../helpers/apiGateway";
+import { findAuth, login } from "../helpers/apiGateway";
 import { Badge, Container } from "react-bootstrap";
 import { Login } from "./Login";
 import { Admin } from "./Admin";
@@ -15,7 +15,7 @@ const initialCredentials = {
 
 export const Main = () => {
   const [credentials, setCredentials] = useState(initialCredentials);
-  const [user, setUser] = useState(null);
+  const [auth, setAuth] = useState(null);
   const [profile, setProfile] = useState(null);
   const [msg, setMsg] = useState(null);
 
@@ -24,9 +24,9 @@ export const Main = () => {
     if (token) {
       const decoded = decodeToken(token);
       (async () => {
-        const u = await findOne(decoded.id);
+        const u = await findAuth(decoded.id);
         if (u.message === "Successfully") {
-          setUser(u.data);
+          setAuth(u.data);
         }
       })();
     }
@@ -41,17 +41,17 @@ export const Main = () => {
   }, [msg]);
 
   useEffect(() => {
-    if (user) {
-      if (user.isAdmin === true) {
+    if (auth) {
+      if (auth.isAdmin === true) {
         setProfile("Administradores");
       }
-      if (user.isAdmin === false) {
+      if (auth.isAdmin === false) {
         setProfile("Clientes");
       }
     }
-  }, [user]);
+  }, [auth]);
 
-  const getUser = (e) => {
+  const getAuth = (e) => {
     e.preventDefault();
     (async () => {
       if (credentials.username && credentials.password) {
@@ -59,9 +59,9 @@ export const Main = () => {
         if (res.message === "Successfully") {
           localStorage.setItem("token", res.token);
           const decoded = decodeToken(res.token);
-          const u = await findOne(decoded.id);
+          const u = await findAuth(decoded.id);
           if (u.message === "Successfully") {
-            setUser(u.data);
+            setAuth(u.data);
           }
         } else {
           setMsg("Usuario y/o contraseña incorrectos");
@@ -73,30 +73,30 @@ export const Main = () => {
   const logout = () => {
     localStorage.clear();
     setCredentials(initialCredentials);
-    setUser(null);
+    setAuth(null);
     setProfile(null);
     setMsg("Sesión finalizada");
   };
 
   return (
     <>
-      <Header user={user} profile={profile} logout={logout} />
+      <Header auth={auth} profile={profile} logout={logout} />
       <Container className="my-5">
         <h1 className="text-center">
           <Badge bg="success" className="mx-2">
             TEAM7 | Bank
           </Badge>
         </h1>
-        {!user && (
+        {!auth && (
           <Login
             credentials={credentials}
             setCredentials={setCredentials}
-            getUser={getUser}
+            getAuth={getAuth}
             setMsg={setMsg}
           />
         )}
         {profile === "Administradores" && <Admin setMsg={setMsg} />}
-        {profile === "Clientes" && <Customer user={user} />}
+        {profile === "Clientes" && <Customer setMsg={setMsg} auth={auth} />}
       </Container>
       <Aside msg={msg} />
     </>

@@ -1,10 +1,12 @@
 import {
-  findAll,
-  createOne,
-  findOne,
-  updateOne,
-  deleteOne,
+  findAuths,
+  createAuth,
+  findAuth,
+  updateAuth,
+  deleteAuth,
   createAccount,
+  findAccount,
+  deleteAccount,
 } from "../helpers/apiGateway";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -13,7 +15,7 @@ import Table from "react-bootstrap/Table";
 import Alert from "react-bootstrap/Alert";
 import { useEffect, useState } from "react";
 
-const initialUser = {
+const initialAuth = {
   firstName: "",
   lastName: "",
   email: "",
@@ -22,8 +24,8 @@ const initialUser = {
 };
 
 export const Admin = ({ setMsg }) => {
-  const [users, setUsers] = useState(null);
-  const [user, setUser] = useState(initialUser);
+  const [auths, setAuths] = useState(null);
+  const [auth, setAuth] = useState(initialAuth);
   const [id, setId] = useState(null);
   const [cta, setCta] = useState(null);
   const [title, setTitle] = useState(null);
@@ -39,25 +41,17 @@ export const Admin = ({ setMsg }) => {
   const showQuestion = () => setQuestion(true);
 
   useEffect(() => {
-    getFindAll();
+    getAuths();
   }, []);
 
   useEffect(() => {
-    setTimeout(() => setMsgForm(null), 3000);
+    setTimeout(() => setMsgForm(null), 4000);
   }, [msgForm]);
-
-  const getFindAll = async () => {
-    const res = await findAll();
-    if (!res) return;
-    else if (res.message === "Successfully") {
-      setUsers(res.data);
-    }
-  };
 
   useEffect(() => {
     switch (cta) {
       case "create":
-        setUser(initialUser);
+        setAuth(initialAuth);
         setTitle("Agregar Nuevo Cliente");
         showForm();
         break;
@@ -72,6 +66,7 @@ export const Admin = ({ setMsg }) => {
         showForm();
         break;
       case "delete":
+        getCurrentCustomer();
         showQuestion();
         break;
       default:
@@ -79,8 +74,16 @@ export const Admin = ({ setMsg }) => {
     }
   }, [cta]);
 
+  const getAuths = async () => {
+    const res = await findAuths();
+    if (!res) return;
+    else if (res.message === "Successfully") {
+      setAuths(res.data);
+    }
+  };
+
   const createCustomer = async (e) => {
-    const res = await createOne(user);
+    const res = await createAuth(auth);
     if (res.message === "Successfully") {
       const r = await createAccount({
         userId: res.data.id,
@@ -96,64 +99,72 @@ export const Admin = ({ setMsg }) => {
         ],
         endingBalance: res.data.initialDeposit,
       });
-      console.log("r: ", r);
       if (r.message === "Successfully") {
         setMsg("Cuenta creada satisfactoriamente");
       }
       setCta(null);
       setTitle(null);
       closeForm();
-      getFindAll();
+      getAuths();
     }
   };
 
   const getCurrentCustomer = async () => {
     if (id) {
-      const currentCustomer = await findOne(id);
+      const currentCustomer = await findAuth(id);
       if (currentCustomer.message === "Successfully") {
-        setUser(currentCustomer.data);
-        /* setUser({
-          firstName: currentCustomer.data.firstName,
-          lastName: currentCustomer.data.lastName,
-          email: currentCustomer.data.email,
-          password: currentCustomer.data.password,
-          startDate: currentCustomer.data.startDate,
-          isAdmin: currentCustomer.data.isAdmin,
-          accountId: currentCustomer.data.accountId,
-          initialDeposit: currentCustomer.data.initialDeposit,
-          endingBalance: currentCustomer.data.endingBalance,
-        }); */
+        setAuth(currentCustomer.data);
       }
     }
   };
 
   const updateCustomer = async (e) => {
-    const res = await updateOne(id, user);
+    const res = await updateAuth(id, auth);
     if (res.message === "Successfully") {
       setId(null);
       setCta(null);
       setTitle(null);
       closeForm();
-      getFindAll();
+      getAuths();
     }
   };
 
   const deleteCustomer = async () => {
     if (id) {
-      const res = await deleteOne(id);
-      if (res.message === "Successfully") {
-        setId(null);
-        setCta(null);
+      const accountCustomer = await findAccount(id);
+      if (accountCustomer.data.endingBalance === 0) {
+        const resp = await deleteAccount(id);
+        if (resp.message === "Successfully") {
+          const res = await deleteAuth(id);
+          if (res.message === "Successfully") {
+            closeQuestion();
+            getAuths();
+            setMsg("Eliminado");
+          }
+        }
+      } else {
         closeQuestion();
-        getFindAll();
+        setMsg("No se puede eliminar cliente, tiene saldo en cuenta");
       }
+      setId(null);
+      setCta(null);
+    }
+  };
+
+  const checkAmount = () => {
+    if (auth.initialDeposit < 1) {
+      setAuth({
+        ...auth,
+        initialDeposit: "",
+      });
+      setMsgForm("Depósito inicial deber mayor a cero");
     }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({
-      ...user,
+    setAuth({
+      ...auth,
       [name]: value,
     });
   };
@@ -167,10 +178,9 @@ export const Admin = ({ setMsg }) => {
     } else {
       id ? updateCustomer() : createCustomer();
     }
-
     setValidated(true);
   };
-  console.log("user: ", user);
+
   return (
     <>
       <Button
@@ -185,7 +195,7 @@ export const Admin = ({ setMsg }) => {
       </Button>
       <Table responsive>
         <thead className="text-center">
-          {users?.length > 0 ? (
+          {auths?.length > 0 ? (
             <tr>
               <th>Cliente</th>
               <th>Opciones</th>
@@ -197,8 +207,8 @@ export const Admin = ({ setMsg }) => {
           )}
         </thead>
         <tbody>
-          {users?.length > 0 ? (
-            users.map((user) => {
+          {auths?.length > 0 ? (
+            auths.map((user) => {
               if (user.isAdmin) {
                 return null;
               } else {
@@ -266,7 +276,7 @@ export const Admin = ({ setMsg }) => {
               <Form.Control
                 type="text"
                 name="firstName"
-                value={user.firstName}
+                value={auth.firstName}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -277,7 +287,7 @@ export const Admin = ({ setMsg }) => {
               <Form.Control
                 type="text"
                 name="lastName"
-                value={user.lastName}
+                value={auth.lastName}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -285,28 +295,30 @@ export const Admin = ({ setMsg }) => {
             </Form.Group>
             {cta === "read" && (
               <>
+                <Form.Group className="mb-3" controlId="formBasicAccountNumber">
+                  <Form.Label>Número de Cuenta</Form.Label>
+                  <Form.Control type="text" value={auth.accountId} readOnly />
+                </Form.Group>
+
                 <Form.Group className="mb-3" controlId="formBasicAccountDate">
                   <Form.Label>Fecha de apertura de cuenta</Form.Label>
                   <Form.Control
                     type="text"
-                    value={user.startDate?.slice(3, 24)}
+                    value={auth.startDate?.slice(3, 24)}
                     readOnly
                   />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicAccountNumber">
-                  <Form.Label>Número de Cuenta</Form.Label>
-                  <Form.Control type="text" value={user.accountId} readOnly />
                 </Form.Group>
               </>
             )}
             {cta !== "update" && (
               <Form.Group className="mb-3" controlId="formBasicDeposit">
-                <Form.Label>Deposito Inicial</Form.Label>
+                <Form.Label>Depósito Inicial</Form.Label>
                 <Form.Control
                   type="number"
                   name="initialDeposit"
-                  value={user.initialDeposit}
+                  value={auth.initialDeposit}
                   onChange={handleChange}
+                  onBlur={checkAmount}
                   required
                   readOnly={cta === "read"}
                 />
@@ -317,7 +329,7 @@ export const Admin = ({ setMsg }) => {
               <Form.Control
                 type="email"
                 name="email"
-                value={user.email}
+                value={auth.email}
                 onChange={handleChange}
                 required
                 readOnly={cta === "read"}
@@ -329,7 +341,7 @@ export const Admin = ({ setMsg }) => {
                 <Form.Control
                   type="password"
                   name="password"
-                  value={user.password}
+                  value={auth.password}
                   onChange={handleChange}
                   required
                 />
@@ -369,7 +381,10 @@ export const Admin = ({ setMsg }) => {
         <Modal.Header closeButton>
           <Modal.Title>¿Eliminar cliente?</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Esta acción no se puede deshacer</Modal.Body>
+        <Modal.Body>
+          <p>Esta acción no se puede deshacer</p>
+          <small>La cuenta del cliente debe tener saldo en cero (0)</small>
+        </Modal.Body>
         <Modal.Footer>
           <Button
             variant="secondary"

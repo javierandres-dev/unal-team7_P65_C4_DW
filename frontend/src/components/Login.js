@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
 
-export const Login = ({ credentials, setCredentials, getUser, setMsg }) => {
+export const Login = ({ credentials, setCredentials, getAuth, setMsg }) => {
   const [validated, setValidated] = useState(false);
 
   const handleSubmit = (event) => {
@@ -11,7 +11,7 @@ export const Login = ({ credentials, setCredentials, getUser, setMsg }) => {
       event.preventDefault();
       event.stopPropagation();
     } else {
-      getUser(event);
+      getAuth(event);
     }
 
     setValidated(true);

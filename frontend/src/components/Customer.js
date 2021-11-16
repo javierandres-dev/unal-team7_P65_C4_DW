@@ -1,4 +1,8 @@
-import { findAccounts, findAccount } from "../helpers/apiGateway";
+import {
+  findAccounts,
+  findAccount,
+  updateAccount,
+} from "../helpers/apiGateway";
 import { useEffect, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
@@ -22,24 +26,38 @@ const initialForm = {
   amount: "",
 };
 
-export const Customer = ({ user }) => {
+export const Customer = ({ setMsg, auth }) => {
   const [account, setAccount] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [transfer, setTransfer] = useState(initialTransfer);
   const [form, setForm] = useState(initialForm);
   const [showTransfer, setShowTransfer] = useState(false);
   const [msgForm, setMsgForm] = useState(null);
+  const [origin, setOrigin] = useState(null);
+  const [destination, setDestination] = useState(null);
 
   useEffect(() => {
     getAccount();
   }, []);
 
   useEffect(() => {
+    if (account) {
+      setOrigin(account);
+    }
+  }, [account]);
+
+  useEffect(() => {
     setTimeout(() => setMsgForm(null), 3000);
   }, [msgForm]);
 
+  useEffect(() => {
+    if (transfer.activity === "Transferencia") {
+      wireTransfer();
+    }
+  }, [transfer]);
+
   const getAccount = async () => {
-    const res = await findAccount(user.id);
+    const res = await findAccount(auth.id);
     setAccount(res.data);
   };
 
@@ -56,6 +74,7 @@ export const Customer = ({ user }) => {
           "La cuenta de destino debe ser diferente a la cuenta de origen"
         );
       } else {
+        setDestination(r[0]);
         setTransfer({
           ...transfer,
           destination: r[0].id,
@@ -67,7 +86,9 @@ export const Customer = ({ user }) => {
   };
 
   const getAmount = () => {
-    if (account.endingBalance - form.amount < 0) {
+    if (form.amount < 1) {
+      setMsgForm("El valor a transferir debe ser mayor a cero");
+    } else if (account.endingBalance - form.amount < 0) {
       setMsgForm("Fondos insuficientes");
     } else {
       setTransfer({
@@ -81,6 +102,31 @@ export const Customer = ({ user }) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const wireTransfer = async () => {
+    const o = origin;
+    o.endingBalance = origin.endingBalance - transfer.amount;
+    o.activities.push(transfer);
+    const upOrigin = await updateAccount(transfer.origin, o);
+
+    const d = destination;
+    d.endingBalance = destination.endingBalance + transfer.amount;
+    d.activities.push(transfer);
+    const upDestination = await updateAccount(transfer.destination, d);
+
+    Promise.all([upOrigin, upDestination]).then((res) => {
+      if (
+        res[0].message === "Successfully" &&
+        res[1].message === "Successfully"
+      ) {
+        setMsg("Transferencia realizada con éxito");
+      } else {
+        setMsg("Ocurrión un error en la transferencia");
+      }
+      setTransfer(initialTransfer);
+      setForm(initialForm);
     });
   };
 
@@ -100,29 +146,41 @@ export const Customer = ({ user }) => {
       const date = new Date();
       setTransfer({
         ...transfer,
-        activity: "Tranferencia",
         date: date.toString(),
         origin: account.id,
+        activity: "Transferencia",
       });
+      closeTranfer();
     }
     setValidated(true);
   };
-
-console.log("transfer: ", transfer);
 
   return (
     <>
       {account ? (
         <>
-          <Card style={{ width: "18rem" }}>
+          <Card style={{ width: "20rem" }}>
             <Card.Body>
               <Card.Title>
-                Titular: {user.firstName} {user.lastName}
+                Titular: {auth.firstName} {auth.lastName}
               </Card.Title>
               <Card.Subtitle className="mb-2 text-muted">
-                Cuenta Nº: {account.accountNumber}
+                Cuenta Nº: {account.id}
               </Card.Subtitle>
-              <Card.Text>Saldo actual: ${account.endingBalance}</Card.Text>
+              <Card.Text>
+                Saldo actual:{" "}
+                <strong
+                  className={
+                    account.endingBalance === auth.initialDeposit
+                      ? "text-success"
+                      : account.endingBalance > 0
+                      ? "text-primary"
+                      : "text-danger"
+                  }
+                >
+                  ${account.endingBalance}
+                </strong>
+              </Card.Text>
               <Button variant="link" onClick={() => setShowTransfer(true)}>
                 Transferencias
               </Button>
@@ -148,13 +206,24 @@ console.log("transfer: ", transfer);
               </thead>
               <tbody>
                 {account.activities?.map((activity, idx) => {
+                  let rowColor,
+                    op = "";
+                  activity.origin === "Depósito inicial"
+                    ? (rowColor = "text-success")
+                    : activity.destination === auth.accountId
+                    ? (rowColor = "text-primary")
+                    : (rowColor = "text-danger");
+                  if (rowColor === "text-primary") op = "+";
+                  if (rowColor === "text-danger") op = "-";
                   return (
-                    <tr key={idx}>
+                    <tr key={idx} className={rowColor}>
                       <td>{activity.date?.slice(3, 24)}</td>
                       <td>{activity.activity}</td>
                       <td>{activity.origin}</td>
                       <td>{activity.destination}</td>
-                      <td>$ {activity.amount}</td>
+                      <td>
+                        {op} $ {activity.amount}
+                      </td>
                     </tr>
                   );
                 })}
