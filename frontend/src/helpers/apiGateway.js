@@ -22,18 +22,26 @@ export const createAuth = async (obj) => {
     });
 };
 
-export const findAuths = async () => {
-  return await fetch(urlAuth)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
+export const findAuths = async (token) => {
+  if (token) {
+    console.log("token: ", token);
+    return await fetch(urlAuth, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Something went wrong");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+  console.error("Token mandatory");
 };
 
 export const findAuth = async (id) => {

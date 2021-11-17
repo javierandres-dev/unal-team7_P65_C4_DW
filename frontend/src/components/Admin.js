@@ -1,3 +1,9 @@
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Table from "react-bootstrap/Table";
+import Alert from "react-bootstrap/Alert";
+import { useEffect, useState } from "react";
 import {
   findAuths,
   createAuth,
@@ -8,12 +14,6 @@ import {
   findAccount,
   deleteAccount,
 } from "../helpers/apiGateway";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
-import Alert from "react-bootstrap/Alert";
-import { useEffect, useState } from "react";
 
 const initialAuth = {
   firstName: "",
@@ -23,7 +23,7 @@ const initialAuth = {
   initialDeposit: "",
 };
 
-export const Admin = ({ setMsg }) => {
+export const Admin = ({ token, setMsg }) => {
   const [auths, setAuths] = useState(null);
   const [auth, setAuth] = useState(initialAuth);
   const [id, setId] = useState(null);
@@ -34,18 +34,12 @@ export const Admin = ({ setMsg }) => {
   const [question, setQuestion] = useState(false);
   const [validated, setValidated] = useState(false);
 
-  const closeForm = () => setForm(false);
-  const showForm = () => setForm(true);
-
-  const closeQuestion = () => setQuestion(false);
-  const showQuestion = () => setQuestion(true);
-
   useEffect(() => {
     getAuths();
   }, []);
 
   useEffect(() => {
-    setTimeout(() => setMsgForm(null), 4000);
+    setTimeout(() => setMsgForm(null), 3000);
   }, [msgForm]);
 
   useEffect(() => {
@@ -74,12 +68,16 @@ export const Admin = ({ setMsg }) => {
     }
   }, [cta]);
 
+  const closeForm = () => setForm(false);
+  const showForm = () => setForm(true);
+
+  const closeQuestion = () => setQuestion(false);
+  const showQuestion = () => setQuestion(true);
+
   const getAuths = async () => {
-    const res = await findAuths();
+    const res = await findAuths(token);
     if (!res) return;
-    else if (res.message === "Successfully") {
-      setAuths(res.data);
-    }
+    else if (res.message === "Successfully") setAuths(res.data);
   };
 
   const createCustomer = async (e) => {
@@ -112,9 +110,8 @@ export const Admin = ({ setMsg }) => {
   const getCurrentCustomer = async () => {
     if (id) {
       const currentCustomer = await findAuth(id);
-      if (currentCustomer.message === "Successfully") {
+      if (currentCustomer.message === "Successfully")
         setAuth(currentCustomer.data);
-      }
     }
   };
 
@@ -195,19 +192,19 @@ export const Admin = ({ setMsg }) => {
       </Button>
       <Table responsive>
         <thead className="text-center">
-          {auths?.length > 0 ? (
+          {auths?.length > 1 ? (
             <tr>
               <th>Cliente</th>
               <th>Opciones</th>
             </tr>
           ) : (
             <tr>
-              <td colSpan="2"></td>
+              <td colSpan="2">No existen clientes</td>
             </tr>
           )}
         </thead>
         <tbody>
-          {auths?.length > 0 ? (
+          {auths?.length > 1 ? (
             auths.map((user) => {
               if (user.isAdmin) {
                 return null;
@@ -254,7 +251,7 @@ export const Admin = ({ setMsg }) => {
             })
           ) : (
             <tr className="text-center">
-              <td colSpan="2">Sin clientes</td>
+              <td colSpan="2">Agregue nuevo cliente</td>
             </tr>
           )}
         </tbody>

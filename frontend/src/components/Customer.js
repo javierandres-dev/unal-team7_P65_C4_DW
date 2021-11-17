@@ -1,9 +1,3 @@
-import {
-  findAccounts,
-  findAccount,
-  updateAccount,
-} from "../helpers/apiGateway";
-import { useEffect, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -12,6 +6,12 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { useEffect, useState } from "react";
+import {
+  findAccounts,
+  findAccount,
+  updateAccount,
+} from "../helpers/apiGateway";
 
 const initialTransfer = {
   activity: "",
@@ -26,7 +26,7 @@ const initialForm = {
   amount: "",
 };
 
-export const Customer = ({ setMsg, auth }) => {
+export const Customer = ({ token, auth, setMsg }) => {
   const [account, setAccount] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
   const [transfer, setTransfer] = useState(initialTransfer);
@@ -35,15 +35,14 @@ export const Customer = ({ setMsg, auth }) => {
   const [msgForm, setMsgForm] = useState(null);
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
+  const [validated, setValidated] = useState(false);
 
   useEffect(() => {
     getAccount();
   }, []);
 
   useEffect(() => {
-    if (account) {
-      setOrigin(account);
-    }
+    if (account) setOrigin(account);
   }, [account]);
 
   useEffect(() => {
@@ -51,19 +50,15 @@ export const Customer = ({ setMsg, auth }) => {
   }, [msgForm]);
 
   useEffect(() => {
-    if (transfer.activity === "Transferencia") {
-      wireTransfer();
-    }
+    if (transfer.activity === "Transferencia") wireTransfer();
   }, [transfer]);
+
+  const closeTranfer = () => setShowTransfer(false);
 
   const getAccount = async () => {
     const res = await findAccount(auth.id);
     setAccount(res.data);
   };
-
-  const closeTranfer = () => setShowTransfer(false);
-
-  const [validated, setValidated] = useState(false);
 
   const getDestination = async () => {
     const res = await findAccounts();
@@ -86,11 +81,11 @@ export const Customer = ({ setMsg, auth }) => {
   };
 
   const getAmount = () => {
-    if (form.amount < 1) {
+    if (form.amount < 1)
       setMsgForm("El valor a transferir debe ser mayor a cero");
-    } else if (account.endingBalance - form.amount < 0) {
+    else if (account.endingBalance - form.amount < 0)
       setMsgForm("Fondos insuficientes");
-    } else {
+    else {
       setTransfer({
         ...transfer,
         amount: parseInt(form.amount),
@@ -98,14 +93,9 @@ export const Customer = ({ setMsg, auth }) => {
     }
   };
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   const wireTransfer = async () => {
+    closeTranfer();
+
     const o = origin;
     o.endingBalance = origin.endingBalance - transfer.amount;
     o.activities.push(transfer);
@@ -130,6 +120,13 @@ export const Customer = ({ setMsg, auth }) => {
     });
   };
 
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   const handleTransfer = (e) => {
     e.preventDefault();
     const f = e.currentTarget;
@@ -138,10 +135,13 @@ export const Customer = ({ setMsg, auth }) => {
       e.stopPropagation();
     } else if (!transfer.destination && !transfer.amount) {
       setMsgForm("Corregir cuenta de destino y valor a trasferir");
+      e.stopPropagation();
     } else if (!transfer.destination) {
       setMsgForm("Cuenta de destino por corregir");
+      e.stopPropagation();
     } else if (!transfer.amount) {
       setMsgForm("Valor a transferir por corregir");
+      e.stopPropagation();
     } else {
       const date = new Date();
       setTransfer({
@@ -150,7 +150,6 @@ export const Customer = ({ setMsg, auth }) => {
         origin: account.id,
         activity: "Transferencia",
       });
-      closeTranfer();
     }
     setValidated(true);
   };

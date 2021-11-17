@@ -1,12 +1,12 @@
 import { decodeToken } from "react-jwt";
-import { findAuth, login } from "../helpers/apiGateway";
 import { Badge, Container } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { findAuth, login } from "../helpers/apiGateway";
+import { Header } from "./Header";
+import { Aside } from "./Aside";
 import { Login } from "./Login";
 import { Admin } from "./Admin";
 import { Customer } from "./Customer";
-import { useEffect, useState } from "react";
-import { Header } from "./Header";
-import { Aside } from "./Aside";
 
 const initialCredentials = {
   username: "",
@@ -15,41 +15,36 @@ const initialCredentials = {
 
 export const Main = () => {
   const [credentials, setCredentials] = useState(initialCredentials);
+  const [token, setToken] = useState(null);
   const [auth, setAuth] = useState(null);
   const [profile, setProfile] = useState(null);
   const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const t = localStorage.getItem("token");
+    if (t) setToken(t);
+  }, []);
+
+  useEffect(() => {
     if (token) {
       const decoded = decodeToken(token);
       (async () => {
         const u = await findAuth(decoded.id);
-        if (u.message === "Successfully") {
-          setAuth(u.data);
-        }
+        if (u.message === "Successfully") setAuth(u.data);
       })();
     }
-  }, []);
-
-  useEffect(() => {
-    if (msg) {
-      setTimeout(() => {
-        setMsg(null);
-      }, 3000);
-    }
-  }, [msg]);
+  }, [token]);
 
   useEffect(() => {
     if (auth) {
-      if (auth.isAdmin === true) {
-        setProfile("Administradores");
-      }
-      if (auth.isAdmin === false) {
-        setProfile("Clientes");
-      }
+      if (auth.isAdmin === true) setProfile("Administradores");
+      if (auth.isAdmin === false) setProfile("Clientes");
     }
   }, [auth]);
+
+  useEffect(() => {
+    if (msg) setTimeout(() => setMsg(null), 3000);
+  }, [msg]);
 
   const getAuth = (e) => {
     e.preventDefault();
@@ -57,12 +52,8 @@ export const Main = () => {
       if (credentials.username && credentials.password) {
         const res = await login(credentials);
         if (res.message === "Successfully") {
+          setToken(res.token);
           localStorage.setItem("token", res.token);
-          const decoded = decodeToken(res.token);
-          const u = await findAuth(decoded.id);
-          if (u.message === "Successfully") {
-            setAuth(u.data);
-          }
         } else {
           setMsg("Usuario y/o contraseña incorrectos");
         }
@@ -73,6 +64,7 @@ export const Main = () => {
   const logout = () => {
     localStorage.clear();
     setCredentials(initialCredentials);
+    setToken(null);
     setAuth(null);
     setProfile(null);
     setMsg("Sesión finalizada");
@@ -95,8 +87,12 @@ export const Main = () => {
             setMsg={setMsg}
           />
         )}
-        {profile === "Administradores" && <Admin setMsg={setMsg} />}
-        {profile === "Clientes" && <Customer setMsg={setMsg} auth={auth} />}
+        {profile === "Administradores" && (
+          <Admin token={token} setMsg={setMsg} />
+        )}
+        {profile === "Clientes" && (
+          <Customer token={token} auth={auth} setMsg={setMsg} />
+        )}
       </Container>
       <Aside msg={msg} />
     </>

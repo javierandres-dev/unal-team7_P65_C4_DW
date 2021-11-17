@@ -60,15 +60,22 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-  Users.findAll()
-    .then((data) => {
-      res.json({ message: "Successfully", data: data });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: err.message || "Some error occured while retrieving Users",
+  let token = req.headers.authorization;
+  if (token.startsWith("Bearer ")) {
+    token = token.substring(7, token.length);
+    console.log(token);
+    Users.findAll()
+      .then((data) => {
+        res.json({ message: "Successfully", data: data });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: err.message || "Some error occured while retrieving Users",
+        });
       });
-    });
+  } else {
+    res.json({ message: "Token mandatory" });
+  }
 };
 
 exports.login = async (req, res) => {

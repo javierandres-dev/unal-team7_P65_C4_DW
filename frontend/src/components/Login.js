@@ -1,19 +1,18 @@
-import { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import { useState } from "react";
 
 export const Login = ({ credentials, setCredentials, getAuth, setMsg }) => {
   const [validated, setValidated] = useState(false);
 
-  const handleSubmit = (event) => {
-    const form = event.currentTarget;
+  const handleSubmit = (e) => {
+    const form = e.currentTarget;
     if (form.checkValidity() === false) {
       setMsg("Todos los campos son obligatorios");
-      event.preventDefault();
-      event.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
     } else {
-      getAuth(event);
+      getAuth(e);
     }
-
     setValidated(true);
   };
 
