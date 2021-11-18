@@ -1,8 +1,8 @@
-"use strict";
-const { sequelize, Sequelize } = require(".");
+'use strict';
+const { sequelize, Sequelize } = require('.');
 
 module.exports = (sequelize, Sequelize) => {
-  const Users = sequelize.define("users", {
+  const Users = sequelize.define('users', {
     id: {
       type: Sequelize.INTEGER,
       primaryKey: true,

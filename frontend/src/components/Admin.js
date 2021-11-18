@@ -1,9 +1,9 @@
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
-import Alert from "react-bootstrap/Alert";
-import { useEffect, useState } from "react";
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table';
+import Alert from 'react-bootstrap/Alert';
+import { useEffect, useState } from 'react';
 import {
   findAuths,
   createAuth,
@@ -13,14 +13,14 @@ import {
   createAccount,
   findAccount,
   deleteAccount,
-} from "../helpers/apiGateway";
+} from '../helpers/apiGateway';
 
 const initialAuth = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  initialDeposit: "",
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  initialDeposit: '',
 };
 
 export const Admin = ({ token, setMsg }) => {
@@ -44,22 +44,22 @@ export const Admin = ({ token, setMsg }) => {
 
   useEffect(() => {
     switch (cta) {
-      case "create":
+      case 'create':
         setAuth(initialAuth);
-        setTitle("Agregar Nuevo Cliente");
+        setTitle('Agregar Nuevo Cliente');
         showForm();
         break;
-      case "read":
+      case 'read':
         getCurrentCustomer();
-        setTitle("Detalles Cliente");
+        setTitle('Detalles Cliente');
         showForm();
         break;
-      case "update":
+      case 'update':
         getCurrentCustomer();
-        setTitle("Actualizar Datos Cliente");
+        setTitle('Actualizar Datos Cliente');
         showForm();
         break;
-      case "delete":
+      case 'delete':
         getCurrentCustomer();
         showQuestion();
         break;
@@ -77,28 +77,31 @@ export const Admin = ({ token, setMsg }) => {
   const getAuths = async () => {
     const res = await findAuths(token);
     if (!res) return;
-    else if (res.message === "Successfully") setAuths(res.data);
+    else if (res.message === 'Successfully') setAuths(res.data);
   };
 
   const createCustomer = async (e) => {
-    const res = await createAuth(auth);
-    if (res.message === "Successfully") {
-      const r = await createAccount({
-        userId: res.data.id,
-        id: res.data.accountId,
-        activities: [
-          {
-            activity: "Apertura de cuenta",
-            date: res.data.startDate,
-            origin: "Depósito inicial",
-            destination: "Depósito inicial",
-            amount: res.data.initialDeposit,
-          },
-        ],
-        endingBalance: res.data.initialDeposit,
-      });
-      if (r.message === "Successfully") {
-        setMsg("Cuenta creada satisfactoriamente");
+    const res = await createAuth(auth, token);
+    if (res.message === 'Successfully') {
+      const r = await createAccount(
+        {
+          userId: res.data.id,
+          id: res.data.accountId,
+          activities: [
+            {
+              activity: 'Apertura de cuenta',
+              date: res.data.startDate,
+              origin: 'Depósito inicial',
+              destination: 'Depósito inicial',
+              amount: res.data.initialDeposit,
+            },
+          ],
+          endingBalance: res.data.initialDeposit,
+        },
+        token
+      );
+      if (r.message === 'Successfully') {
+        setMsg('Cuenta creada satisfactoriamente');
       }
       setCta(null);
       setTitle(null);
@@ -109,15 +112,15 @@ export const Admin = ({ token, setMsg }) => {
 
   const getCurrentCustomer = async () => {
     if (id) {
-      const currentCustomer = await findAuth(id);
-      if (currentCustomer.message === "Successfully")
+      const currentCustomer = await findAuth(id, token);
+      if (currentCustomer.message === 'Successfully')
         setAuth(currentCustomer.data);
     }
   };
 
   const updateCustomer = async (e) => {
-    const res = await updateAuth(id, auth);
-    if (res.message === "Successfully") {
+    const res = await updateAuth(id, auth, token);
+    if (res.message === 'Successfully') {
       setId(null);
       setCta(null);
       setTitle(null);
@@ -128,20 +131,20 @@ export const Admin = ({ token, setMsg }) => {
 
   const deleteCustomer = async () => {
     if (id) {
-      const accountCustomer = await findAccount(id);
+      const accountCustomer = await findAccount(id, token);
       if (accountCustomer.data.endingBalance === 0) {
-        const resp = await deleteAccount(id);
-        if (resp.message === "Successfully") {
-          const res = await deleteAuth(id);
-          if (res.message === "Successfully") {
+        const resp = await deleteAccount(id, token);
+        if (resp.message === 'Successfully') {
+          const res = await deleteAuth(id, token);
+          if (res.message === 'Successfully') {
             closeQuestion();
             getAuths();
-            setMsg("Eliminado");
+            setMsg('Eliminado');
           }
         }
       } else {
         closeQuestion();
-        setMsg("No se puede eliminar cliente, tiene saldo en cuenta");
+        setMsg('No se puede eliminar cliente, tiene saldo en cuenta');
       }
       setId(null);
       setCta(null);
@@ -152,9 +155,9 @@ export const Admin = ({ token, setMsg }) => {
     if (auth.initialDeposit < 1) {
       setAuth({
         ...auth,
-        initialDeposit: "",
+        initialDeposit: '',
       });
-      setMsgForm("Depósito inicial deber mayor a cero");
+      setMsgForm('Depósito inicial deber mayor a cero');
     }
   };
 
@@ -170,7 +173,7 @@ export const Admin = ({ token, setMsg }) => {
     e.preventDefault();
     const f = e.currentTarget;
     if (f.checkValidity() === false) {
-      setMsgForm("Todos los campos son obligatorios");
+      setMsgForm('Todos los campos son obligatorios');
       e.stopPropagation();
     } else {
       id ? updateCustomer() : createCustomer();
@@ -181,17 +184,17 @@ export const Admin = ({ token, setMsg }) => {
   return (
     <>
       <Button
-        variant="primary"
-        size="lg"
-        className="my-5"
+        variant='primary'
+        size='lg'
+        className='my-5'
         onClick={() => {
-          setCta("create");
+          setCta('create');
         }}
       >
         Agregar Nuevo Cliente
       </Button>
       <Table responsive>
-        <thead className="text-center">
+        <thead className='text-center'>
           {auths?.length > 1 ? (
             <tr>
               <th>Cliente</th>
@@ -199,7 +202,7 @@ export const Admin = ({ token, setMsg }) => {
             </tr>
           ) : (
             <tr>
-              <td colSpan="2">No existen clientes</td>
+              <td colSpan='2'>No existen clientes</td>
             </tr>
           )}
         </thead>
@@ -212,34 +215,34 @@ export const Admin = ({ token, setMsg }) => {
                 return (
                   <tr key={user.id}>
                     <td>{`${user.firstName} ${user.lastName}`}</td>
-                    <td className="text-center">
+                    <td className='text-center'>
                       <Button
-                        variant="info"
-                        size="sm"
+                        variant='info'
+                        size='sm'
                         onClick={() => {
                           setId(user.id);
-                          setCta("read");
+                          setCta('read');
                         }}
                       >
                         Ver más...
                       </Button>
                       <Button
-                        variant="warning"
-                        size="sm"
-                        className="mx-3"
+                        variant='warning'
+                        size='sm'
+                        className='mx-3'
                         onClick={() => {
                           setId(user.id);
-                          setCta("update");
+                          setCta('update');
                         }}
                       >
                         Actualizar
                       </Button>
                       <Button
-                        variant="danger"
-                        size="sm"
+                        variant='danger'
+                        size='sm'
                         onClick={() => {
                           setId(user.id);
-                          setCta("delete");
+                          setCta('delete');
                         }}
                       >
                         Eliminar
@@ -250,8 +253,8 @@ export const Admin = ({ token, setMsg }) => {
               }
             })
           ) : (
-            <tr className="text-center">
-              <td colSpan="2">Agregue nuevo cliente</td>
+            <tr className='text-center'>
+              <td colSpan='2'>Agregue nuevo cliente</td>
             </tr>
           )}
         </tbody>
@@ -268,103 +271,103 @@ export const Admin = ({ token, setMsg }) => {
         </Modal.Header>
         <Modal.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="formBasicFirstName">
+            <Form.Group className='mb-3' controlId='formBasicFirstName'>
               <Form.Label>Nombre</Form.Label>
               <Form.Control
-                type="text"
-                name="firstName"
+                type='text'
+                name='firstName'
                 value={auth.firstName}
                 onChange={handleChange}
                 required
-                readOnly={cta === "read"}
+                readOnly={cta === 'read'}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicLastName">
+            <Form.Group className='mb-3' controlId='formBasicLastName'>
               <Form.Label>Apellido</Form.Label>
               <Form.Control
-                type="text"
-                name="lastName"
+                type='text'
+                name='lastName'
                 value={auth.lastName}
                 onChange={handleChange}
                 required
-                readOnly={cta === "read"}
+                readOnly={cta === 'read'}
               />
             </Form.Group>
-            {cta === "read" && (
+            {cta === 'read' && (
               <>
-                <Form.Group className="mb-3" controlId="formBasicAccountNumber">
+                <Form.Group className='mb-3' controlId='formBasicAccountNumber'>
                   <Form.Label>Número de Cuenta</Form.Label>
-                  <Form.Control type="text" value={auth.accountId} readOnly />
+                  <Form.Control type='text' value={auth.accountId} readOnly />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formBasicAccountDate">
+                <Form.Group className='mb-3' controlId='formBasicAccountDate'>
                   <Form.Label>Fecha de apertura de cuenta</Form.Label>
                   <Form.Control
-                    type="text"
+                    type='text'
                     value={auth.startDate?.slice(3, 24)}
                     readOnly
                   />
                 </Form.Group>
               </>
             )}
-            {cta !== "update" && (
-              <Form.Group className="mb-3" controlId="formBasicDeposit">
+            {cta !== 'update' && (
+              <Form.Group className='mb-3' controlId='formBasicDeposit'>
                 <Form.Label>Depósito Inicial</Form.Label>
                 <Form.Control
-                  type="number"
-                  name="initialDeposit"
+                  type='number'
+                  name='initialDeposit'
                   value={auth.initialDeposit}
                   onChange={handleChange}
                   onBlur={checkAmount}
                   required
-                  readOnly={cta === "read"}
+                  readOnly={cta === 'read'}
                 />
               </Form.Group>
             )}
-            <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Group className='mb-3' controlId='formBasicEmail'>
               <Form.Label>Correo Electrónico</Form.Label>
               <Form.Control
-                type="email"
-                name="email"
+                type='email'
+                name='email'
                 value={auth.email}
                 onChange={handleChange}
                 required
-                readOnly={cta === "read"}
+                readOnly={cta === 'read'}
               />
             </Form.Group>
-            {cta === "read" ? null : (
-              <Form.Group className="mb-3" controlId="formBasicPassword">
+            {cta === 'read' ? null : (
+              <Form.Group className='mb-3' controlId='formBasicPassword'>
                 <Form.Label>Contraseña</Form.Label>
                 <Form.Control
-                  type="password"
-                  name="password"
+                  type='password'
+                  name='password'
                   value={auth.password}
                   onChange={handleChange}
                   required
                 />
               </Form.Group>
             )}
-            {cta === "read" ? null : (
-              <Button variant="primary" type="submit">
-                {id ? "Guardar cambios" : "Agregar"}
+            {cta === 'read' ? null : (
+              <Button variant='primary' type='submit'>
+                {id ? 'Guardar cambios' : 'Agregar'}
               </Button>
             )}
           </Form>
           {msgForm ? (
-            <Alert variant="warning" className="my-2">
+            <Alert variant='warning' className='my-2'>
               {msgForm}
             </Alert>
           ) : null}
         </Modal.Body>
         <Modal.Footer>
           <Button
-            variant="secondary"
+            variant='secondary'
             onClick={() => {
               setCta(null);
               closeForm();
             }}
           >
-            {cta === "read" ? "Volver" : "Cancelar"}
+            {cta === 'read' ? 'Volver' : 'Cancelar'}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -384,7 +387,7 @@ export const Admin = ({ token, setMsg }) => {
         </Modal.Body>
         <Modal.Footer>
           <Button
-            variant="secondary"
+            variant='secondary'
             onClick={() => {
               setCta(null);
               closeQuestion();
@@ -392,7 +395,7 @@ export const Admin = ({ token, setMsg }) => {
           >
             Cancelar
           </Button>
-          <Button variant="danger" onClick={deleteCustomer}>
+          <Button variant='danger' onClick={deleteCustomer}>
             Si, Eliminar
           </Button>
         </Modal.Footer>

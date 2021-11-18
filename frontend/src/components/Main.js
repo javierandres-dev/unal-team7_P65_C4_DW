@@ -1,16 +1,16 @@
-import { decodeToken } from "react-jwt";
-import { Badge, Container } from "react-bootstrap";
-import { useEffect, useState } from "react";
-import { findAuth, login } from "../helpers/apiGateway";
-import { Header } from "./Header";
-import { Aside } from "./Aside";
-import { Login } from "./Login";
-import { Admin } from "./Admin";
-import { Customer } from "./Customer";
+import { decodeToken } from 'react-jwt';
+import { Badge, Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { findAuth, login } from '../helpers/apiGateway';
+import { Header } from './Header';
+import { Aside } from './Aside';
+import { Login } from './Login';
+import { Admin } from './Admin';
+import { Customer } from './Customer';
 
 const initialCredentials = {
-  username: "",
-  password: "",
+  username: '',
+  password: '',
 };
 
 export const Main = () => {
@@ -21,7 +21,7 @@ export const Main = () => {
   const [msg, setMsg] = useState(null);
 
   useEffect(() => {
-    const t = localStorage.getItem("token");
+    const t = localStorage.getItem('token');
     if (t) setToken(t);
   }, []);
 
@@ -29,16 +29,16 @@ export const Main = () => {
     if (token) {
       const decoded = decodeToken(token);
       (async () => {
-        const u = await findAuth(decoded.id);
-        if (u.message === "Successfully") setAuth(u.data);
+        const u = await findAuth(decoded.id, token);
+        if (u.message === 'Successfully') setAuth(u.data);
       })();
     }
   }, [token]);
 
   useEffect(() => {
     if (auth) {
-      if (auth.isAdmin === true) setProfile("Administradores");
-      if (auth.isAdmin === false) setProfile("Clientes");
+      if (auth.isAdmin === true) setProfile('Administradores');
+      if (auth.isAdmin === false) setProfile('Clientes');
     }
   }, [auth]);
 
@@ -51,11 +51,11 @@ export const Main = () => {
     (async () => {
       if (credentials.username && credentials.password) {
         const res = await login(credentials);
-        if (res.message === "Successfully") {
+        if (res.message === 'Successfully') {
           setToken(res.token);
-          localStorage.setItem("token", res.token);
+          localStorage.setItem('token', res.token);
         } else {
-          setMsg("Usuario y/o contraseña incorrectos");
+          setMsg('Usuario y/o contraseña incorrectos');
         }
       }
     })();
@@ -67,15 +67,15 @@ export const Main = () => {
     setToken(null);
     setAuth(null);
     setProfile(null);
-    setMsg("Sesión finalizada");
+    setMsg('Sesión finalizada');
   };
 
   return (
     <>
       <Header auth={auth} profile={profile} logout={logout} />
-      <Container className="my-5">
-        <h1 className="text-center">
-          <Badge bg="success" className="mx-2">
+      <Container className='my-5'>
+        <h1 className='text-center'>
+          <Badge bg='success' className='mx-2'>
             TEAM7 | Bank
           </Badge>
         </h1>
@@ -87,10 +87,10 @@ export const Main = () => {
             setMsg={setMsg}
           />
         )}
-        {profile === "Administradores" && (
+        {profile === 'Administradores' && (
           <Admin token={token} setMsg={setMsg} />
         )}
-        {profile === "Clientes" && (
+        {profile === 'Clientes' && (
           <Customer token={token} auth={auth} setMsg={setMsg} />
         )}
       </Container>

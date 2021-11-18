@@ -1,110 +1,12 @@
-const urlAuth = "http://localhost:4000/auth";
-const urlAccount = "http://localhost:5000/account";
-
-export const createAuth = async (obj) => {
-  return await fetch(urlAuth, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(obj),
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      return { error: error };
-    });
-};
-
-export const findAuths = async (token) => {
-  if (token) {
-    console.log("token: ", token);
-    return await fetch(urlAuth, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Something went wrong");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-  console.error("Token mandatory");
-};
-
-export const findAuth = async (id) => {
-  return await fetch(`${urlAuth}/${id}`)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-export const updateAuth = async (id, obj) => {
-  return await fetch(`${urlAuth}/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      firstName: obj.firstName,
-      lastName: obj.lastName,
-      email: obj.email,
-      password: obj.password,
-    }),
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-export const deleteAuth = async (id) => {
-  return await fetch(`${urlAuth}/${id}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+const urlAuth = 'http://localhost:4000/auth';
+const urlAccount = 'http://localhost:5000/account';
 
 export const login = async (obj) => {
   try {
     const res = await fetch(`${urlAuth}/login`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(obj),
     });
@@ -120,11 +22,12 @@ export const login = async (obj) => {
   }
 };
 
-export const createAccount = async (obj) => {
-  return await fetch(urlAccount, {
-    method: "POST",
+export const createAuth = async (obj, token) => {
+  return await fetch(urlAuth, {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(obj),
   })
@@ -132,7 +35,7 @@ export const createAccount = async (obj) => {
       if (response.ok) {
         return response.json();
       } else {
-        throw new Error("Something went wrong");
+        throw new Error('Something went wrong');
       }
     })
     .catch((error) => {
@@ -141,39 +44,93 @@ export const createAccount = async (obj) => {
     });
 };
 
-export const findAccounts = async () => {
-  return await fetch(urlAccount)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-export const findAccount = async (id) => {
-  return await fetch(`${urlAccount}/${id}`)
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error("Something went wrong");
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
-
-export const updateAccount = async (id, obj) => {
-  return await fetch(`${urlAccount}/${id}`, {
-    method: "PUT",
+export const findAuths = async (token) => {
+  return await fetch(urlAuth, {
     headers: {
-      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const findAuth = async (id, token) => {
+  return await fetch(`${urlAuth}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const updateAuth = async (id, obj, token) => {
+  return await fetch(`${urlAuth}/${id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      firstName: obj.firstName,
+      lastName: obj.lastName,
+      email: obj.email,
+      password: obj.password,
+    }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const deleteAuth = async (id, token) => {
+  return await fetch(`${urlAuth}/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const createAccount = async (obj, token) => {
+  return await fetch(urlAccount, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(obj),
   })
@@ -181,7 +138,26 @@ export const updateAccount = async (id, obj) => {
       if (response.ok) {
         return response.json();
       } else {
-        throw new Error("Something went wrong");
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      return { error: error };
+    });
+};
+
+export const findAccounts = async (token) => {
+  return await fetch(urlAccount, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
       }
     })
     .catch((error) => {
@@ -189,15 +165,57 @@ export const updateAccount = async (id, obj) => {
     });
 };
 
-export const deleteAccount = async (id) => {
+export const findAccount = async (id, token) => {
   return await fetch(`${urlAccount}/${id}`, {
-    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   })
     .then((response) => {
       if (response.ok) {
         return response.json();
       } else {
-        throw new Error("Something went wrong");
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const updateAccount = async (id, obj, token) => {
+  return await fetch(`${urlAccount}/${id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(obj),
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const deleteAccount = async (id, token) => {
+  return await fetch(`${urlAccount}/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Something went wrong');
       }
     })
     .catch((error) => {

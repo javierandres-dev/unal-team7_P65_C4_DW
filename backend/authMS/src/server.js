@@ -1,8 +1,8 @@
-"use strict";
-const db = require("./models");
-const routes = require("./routes");
-const cors = require("cors");
-const express = require("express");
+'use strict';
+const db = require('./models');
+const routes = require('./routes');
+const cors = require('cors');
+const express = require('express');
 
 db.sequelize.sync();
 
@@ -12,10 +12,10 @@ const server = express();
 
 server.use(cors());
 server.use(express.json());
-server.use("/auth", routes);
+server.use('/auth', routes);
 
-server.get("/", (req, res) => {
-  res.json({ message: "Auth Works!" });
+server.get('/', (req, res) => {
+  res.json({ message: 'Auth Works!' });
 });
 
 server.listen(port, () => {
