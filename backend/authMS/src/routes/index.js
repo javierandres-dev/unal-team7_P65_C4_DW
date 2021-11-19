@@ -4,6 +4,7 @@ const express = require('express');
 
 const router = express.Router();
 
+router.post('/first', controller.first);
 router.post('/login', controller.login);
 router.post('/', controller.authenticateToken, controller.create);
 router.get('/', controller.authenticateToken, controller.findAll);

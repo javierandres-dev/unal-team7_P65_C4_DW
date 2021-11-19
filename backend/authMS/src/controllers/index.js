@@ -5,6 +5,49 @@ const jwt = require('jsonwebtoken');
 
 const Users = db.users;
 
+exports.first = async (req, res) => {
+  if (
+    !req.body.firstName ||
+    !req.body.lastName ||
+    !req.body.email ||
+    !req.body.password ||
+    !req.body.isAdmin
+  ) {
+    res.status(400).json({
+      message: 'Content can not be empty!',
+    });
+    return;
+  }
+  const isAdmin = req.body.isAdmin === true;
+  if (!isAdmin) {
+    res.status(400).json({
+      message: 'Oops! error occurred in "first"',
+    });
+    return;
+  }
+  const hashPwd = await bcryptjs.hash(req.body.password, 1);
+  const startDate = new Date();
+  const user = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: hashPwd,
+    startDate: startDate.toString(),
+    isAdmin: isAdmin,
+    accountId: null,
+    initialDeposit: null,
+  };
+  Users.create(user)
+    .then((data) => {
+      res.json({ message: 'Successfully', data: data });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message || 'Some error occurred in "first!!!"',
+      });
+    });
+};
+
 exports.create = async (req, res) => {
   if (
     !req.body.firstName ||
@@ -17,21 +60,15 @@ exports.create = async (req, res) => {
     });
     return;
   }
-  const startDate = new Date();
   const isAdmin = req.body.isAdmin === true;
-  let accountId = null;
-  let initialDeposit = null;
-  if (!isAdmin) {
-    if (!req.body.initialDeposit) {
-      res.status(400).json({
-        message: 'Content can not be empty!',
-      });
-      return;
-    }
-    accountId = Date.now();
-    initialDeposit = req.body.initialDeposit;
+  if (isAdmin) {
+    res.status(400).json({
+      message: 'Oops! error occurred in "create"',
+    });
+    return;
   }
   const hashPwd = await bcryptjs.hash(req.body.password, 1);
+  const startDate = new Date();
   const user = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
@@ -39,8 +76,8 @@ exports.create = async (req, res) => {
     password: hashPwd,
     startDate: startDate.toString(),
     isAdmin: isAdmin,
-    accountId: accountId,
-    initialDeposit: initialDeposit,
+    accountId: Date.now(),
+    initialDeposit: req.body.initialDeposit,
   };
   Users.create(user)
     .then((data) => {
@@ -78,9 +115,14 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
-  Users.update(req.body, {
+  const hashPwd = await bcryptjs.hash(req.body.password, 1);
+  const user = {
+    ...req.body,
+    password: hashPwd,
+  };
+  Users.update(user, {
     where: { id: id },
   }).then((data) => {
     if (data) {

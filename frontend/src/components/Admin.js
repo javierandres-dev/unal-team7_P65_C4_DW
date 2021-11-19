@@ -207,7 +207,7 @@ export const Admin = ({ token, setMsg }) => {
           )}
         </thead>
         <tbody>
-          {auths?.length > 1 ? (
+          {auths?.length > 0 ? (
             auths.map((user) => {
               if (user.isAdmin) {
                 return null;

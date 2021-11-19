@@ -3,7 +3,7 @@ import Container from 'react-bootstrap/Container';
 
 export const Header = ({ auth, profile, logout }) => {
   return (
-    <Container fluid className='bg-dark text-light pt-2'>
+    <Container fluid className='bg-dark text-light pt-2 px-5'>
       {!auth && <p className='pb-2'>¡Bienvenido!</p>}
       {auth && (
         <div className='d-flex justify-content-between'>
