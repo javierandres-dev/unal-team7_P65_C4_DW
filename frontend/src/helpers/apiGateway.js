@@ -1,6 +1,24 @@
 const urlAuth = 'http://localhost:4000/auth';
 const urlAccount = 'http://localhost:5000/account';
 
+export const createFirst = async (obj) => {
+  return await fetch(urlAuth + '/first', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(obj),
+  })
+    .then((response) => {
+      if (response.ok) return response.json();
+      else throw new Error('Something went wrong');
+    })
+    .catch((error) => {
+      console.error(error);
+      return { error: error };
+    });
+};
+
 export const login = async (obj) => {
   try {
     const res = await fetch(`${urlAuth}/login`, {
