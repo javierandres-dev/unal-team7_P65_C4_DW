@@ -26,6 +26,7 @@ export const First = () => {
     const res = await createFirst(obj);
     if (res.message === 'Successfully') {
       setMsgForm('Agregado satisfactoriamente');
+      setObj(initialObj);
     }
   };
 
