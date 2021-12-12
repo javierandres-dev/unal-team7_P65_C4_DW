@@ -13,7 +13,7 @@ import {
   createAccount,
   findAccount,
   deleteAccount,
-} from '../helpers/apiGateway';
+} from '../helpers/withoutApiGateway';
 
 const initialAuth = {
   firstName: '',

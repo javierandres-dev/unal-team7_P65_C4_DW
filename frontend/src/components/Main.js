@@ -1,7 +1,7 @@
 import { decodeToken } from 'react-jwt';
 import { Badge, Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
-import { findAuth, login } from '../helpers/apiGateway';
+import { findAuth, login } from '../helpers/withoutApiGateway';
 import { Header } from './Header';
 import { Aside } from './Aside';
 import { Login } from './Login';

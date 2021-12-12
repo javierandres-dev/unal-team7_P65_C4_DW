@@ -6,7 +6,7 @@ const express = require('express');
 
 db.sequelize.sync();
 
-const port = 5000;
+const port = 6000;
 
 const server = express();
 

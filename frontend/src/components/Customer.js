@@ -11,7 +11,7 @@ import {
   findAccounts,
   findAccount,
   updateAccount,
-} from '../helpers/apiGateway';
+} from '../helpers/withoutApiGateway';
 
 const initialTransfer = {
   activity: '',

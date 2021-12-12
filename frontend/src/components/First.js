@@ -1,4 +1,4 @@
-import { createFirst } from '../helpers/apiGateway';
+import { createFirst } from '../helpers/withoutApiGateway';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
