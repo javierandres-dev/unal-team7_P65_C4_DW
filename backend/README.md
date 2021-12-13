@@ -6,6 +6,7 @@
 
 ### Directories
 :open_file_folder: accountMS  
+:open_file_folder: apiGateway  
 :open_file_folder: authMS
 
 ## TEAM

@@ -5,8 +5,8 @@ API Gateway
 
 ## Stack
 * Nodejs
-  - Graphql
   - Apollo Server
+  - Graphql
 
 ## TEAM
 [Maribel Franco]()  

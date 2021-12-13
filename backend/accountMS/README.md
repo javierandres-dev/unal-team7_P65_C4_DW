@@ -5,6 +5,7 @@ Account MicroService
 
 ## Stack
 * Nodejs
+  - Expressjs
 
 ## TEAM
 [Maribel Franco]()  

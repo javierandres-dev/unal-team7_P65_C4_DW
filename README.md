@@ -5,6 +5,7 @@ TEAM7 | Bank :copyright: is our final project based on MisiónTIC2021 Ciclo4 by 
 How does it look? Take a look at:
 * [Heroku Deploy - Auth MicroService](https://authp65c4dw.herokuapp.com/)
 * [Heroku Deploy - Account Microservice](https://accountp65c4dw.herokuapp.com/)
+* [Heroku Deploy - API Gateway](https://apigatewayp65c4dw.herokuapp.com/)
 * [Heroku Deploy - User Interface](https://uip65c4dw.herokuapp.com/)
 
 ## Stack
@@ -15,6 +16,7 @@ How does it look? Take a look at:
 
 ### Directories
 :open_file_folder: backend/accountMS  
+:open_file_folder: backend/apiGateway  
 :open_file_folder: backend/authMS  
 :open_file_folder: frontend
 
@@ -28,7 +30,7 @@ Then you must make sure you have two PostgreSQL databases running locally called
 * accountDB
 
 ### Running with Nodejs locally
-Then you can download this repository, open three terminals window and navigate
+Then you can download this repository, open four terminals window and navigate
 to the folder in each terminal, and then type the following.
 #### Terminal 1
 ##### Auth - First microservice
@@ -47,8 +49,16 @@ npm i
 npm start
 ```
 #### Terminal 3
-##### User Interface
+##### API Gateway
 Type the following in your third terminal
+```
+cd backend/apiGateway
+npm i
+npm start
+```
+#### Terminal 4
+##### User Interface
+Type the following in your fourth terminal
 ```
 cd frontend
 npm i
