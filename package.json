@@ -1,6 +1,6 @@
 {
   "name": "unal-team7_p65_c4_dw",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,10 +11,10 @@
     "url": "git+https://github.com/javierandresgp/unal-team7_P65_C4_DW.git"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/javierandresgp/unal-team7_P65_C4_DW/issues"
   },
-  "homepage": "https://github.com/javierandresgp/unal-team7_P65_C4_DW#readme"
+  "homepage": "https://github.com/javierandresgp/unal-team7_P65_C4_DW#readme",
+  "author": "https://www.javierandresgp.com"
 }
