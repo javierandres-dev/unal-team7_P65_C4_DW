@@ -2,7 +2,7 @@
 :octocat: unal-team7_P65_C4_DW
 
 TEAM7 | Bank :copyright: is our final project based on MisiónTIC2021 Ciclo4 by Team7 P65_C4_DW  
-How does it look? Take a look at:
+How does it look? Take a look at: [View Demo](https://youtu.be/hh9vCFwJku4)
 * [Heroku Deploy - Auth MicroService](https://authp65c4dw.herokuapp.com/)
 * [Heroku Deploy - Account Microservice](https://accountp65c4dw.herokuapp.com/)
 * [Heroku Deploy - API Gateway](https://apigatewayp65c4dw.herokuapp.com/)
@@ -86,4 +86,4 @@ If you are a client, you can handle you bank account (Transfer, History)
 [Sergio Novoa]()  
 [Julián Nieto]()  
 [Julián Púlido]()  
-[Javier Andrés Garzón Patarroyo](https://www.javierandresgp.com)
+[javi](https://github.com/javierandres-dev)
